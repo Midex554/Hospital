@@ -23,14 +23,18 @@ public class AuthService {
 
     }
 
-    public RegisterResponse register(User user)  {
+    public RegisterResponse register(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
 
         return new RegisterResponse(
-         savedUser.getId(),
-         savedUser.getFullName(),
-         savedUser.getEmail(),
+                savedUser.getId(),
+                savedUser.getFullName(),
+                savedUser.getEmail(),
                 savedUser.getRole()
         );
     }
