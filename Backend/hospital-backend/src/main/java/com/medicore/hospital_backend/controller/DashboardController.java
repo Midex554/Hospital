@@ -9,16 +9,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/dashboard")
 
-public class DashboardContrller {
+public class DashboardController {
 
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
-    
-    public DashboardContrller(
-            PatientRepository patientRepository;
-            DoctorRepository doctorRepository;
-            AppointmentRepository appointmentRepository;
+
+    public DashboardController(
+            PatientRepository patientRepository,
+            DoctorRepository doctorRepository,
+            AppointmentRepository appointmentRepository
     ) {
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;

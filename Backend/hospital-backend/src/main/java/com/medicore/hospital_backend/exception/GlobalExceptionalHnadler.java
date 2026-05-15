@@ -2,6 +2,7 @@ package com.medicore.hospital_backend.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -29,6 +30,18 @@ public class GlobalExceptionalHnadler {
                         "status", 500,
                         "error", "Internal Server Error",
                         "message", "Something went wrong"
+                ));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "status", 400,
+                        "error", "Bad Request",
+                        "message", "Cannot delete this record because it is linked to other hospital data"
                 ));
     }
 }

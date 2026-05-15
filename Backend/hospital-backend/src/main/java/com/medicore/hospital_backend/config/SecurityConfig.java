@@ -52,6 +52,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/bills/**")
                         .hasAnyAuthority("ADMIN", "RECEPTIONIST")
 
+                        .requestMatchers("/api/dashboard/**")
+                        .hasAnyAuthority("ADMIN")
+
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",

@@ -1,5 +1,7 @@
 package com.medicore.hospital_backend.service;
 import com.medicore.hospital_backend.model.Patient;
+import com.medicore.hospital_backend.repository.AppointmentRepository;
+import com.medicore.hospital_backend.repository.BillRepository;
 import com.medicore.hospital_backend.repository.PatientRepository;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +11,15 @@ import java.util.List;
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final BillRepository billRepository;
 
-    public PatientService(PatientRepository patientRepository) {
+    public PatientService(PatientRepository patientRepository,
+                          AppointmentRepository appointmentRepository,
+                          BillRepository billRepository) {
         this.patientRepository = patientRepository;
+        this.appointmentRepository = appointmentRepository;
+        this.billRepository = billRepository;
     }
 
     //Get all patients
@@ -45,8 +53,20 @@ public class PatientService {
     }
 
     public void deletePatient(Long id) {
-        Patient patient = getPatientById(id);
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not Found"));
+
+        boolean hasAppointment = appointmentRepository.existsByPatientId(id);
+        boolean hassBills = billRepository.existsByPatientId(id);
+
+        if (hasAppointment || hassBills) {
+            throw new RuntimeException(
+                    "Patient cannot be deleted because they have appointment or bills"
+            );
+        }
+
         patientRepository.delete(patient);
+
     }
 
 
