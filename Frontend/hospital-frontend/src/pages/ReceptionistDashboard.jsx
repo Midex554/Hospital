@@ -1,29 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../layout/DashboardLayout";
 
 function ReceptionistDashboard() {
-   const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-
-        navigate("/");
-    };
-
-    return (
-        <div className="p-10">
-            <h1 className="text-3xl font-bold mb-5">
-                 Admin Dashboard
-            </h1>
-
-            <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-5 py-2 rounded"
-                >
-                    Logout
-                </button>
-           </div>
-    );
+  return (
+    <DashboardLayout title="Receptionist Dashboard">
+      <div className="bg-white rounded-2xl shadow p-6">
+        <h1 className="text-2xl font-bold text-slate-800">Receptionist Dashboard</h1>
+        <p className="text-slate-500 mt-2">Receptionist workspace will manage patients, appointments, and billing.</p>
+      </div>
+    </DashboardLayout>
+  );
 }
 
 export default ReceptionistDashboard;

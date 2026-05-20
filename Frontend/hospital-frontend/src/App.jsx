@@ -1,83 +1,51 @@
-import { Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
+// ─────────────────────────────────────────────
+//  MediCore HMS — App.jsx (Router)
+// ─────────────────────────────────────────────
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
-import DoctorDashboard from "./pages/DoctorDashboard";
-import ReceptionistDashboard from "./pages/ReceptionistDashboard";
-import Patients from "./pages/Patients";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Appointment from "./pages/Appointment";
-import MedicalRecords from "./pages/MedicalRecords";
-import Billing from "./pages/Billing";
+import PatientsPage from "./pages/PatientsPage";
+import AppointmentsPage from "./pages/AppointmentsPage";
+import BillingPage from "./pages/BillingPage";
+import MedicalRecordsPage from "./pages/MedicalRecordsPage";
+import "./index.css";
 
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Login />} />
+// ── Protected Route ───────────────────────────
+function ProtectedRoute({ children, allowedRoles }) {
+  const token = localStorage.getItem("token");
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "{}");
+    } catch {
+      return {};
+    }
+  })();
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRole="ADMIN">
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
+  if (!token) return <Navigate to="/login" replace />;
 
-      <Route
-        path="/doctor"
-        element={
-          <ProtectedRoute allowedRole="DOCTOR">
-            <DoctorDashboard />
-          </ProtectedRoute>
-        }
-      />
+  if (allowedRoles && !allowedRoles.includes(user?.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
-      <Route
-        path="/patients"
-        element={
-          <ProtectedRoute allowedRole="ADMIN">
-            <Patients />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/medical-records"
-        element={
-          <ProtectedRoute allowedRole="ADMIN">
-            <MedicalRecords />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/billing"
-        element={
-          <ProtectedRoute allowedRole="ADMIN">
-            <Billing />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/appointments"
-        element={
-          <ProtectedRoute allowedRole="ADMIN">
-            <Appointment />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/receptionist"
-        element={
-          <ProtectedRoute allowedRole="RECEPTIONIST">
-            <ReceptionistDashboard />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
-  );
+  return children;
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/patients" element={<PatientsPage />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route path="/billing" element={<BillingPage />} />
+        <Route path="/medical-records" element={<MedicalRecordsPage />} />
+        <Route path="*" element={<Navigate to="/admin" />} />
+        os
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

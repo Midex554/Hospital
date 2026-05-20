@@ -2,8 +2,7 @@
    MediCore HMS — Global Styles (index.css)
    ───────────────────────────────────────────── */
 
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,7 +10,7 @@
 
 @layer base {
   html {
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -65,14 +64,8 @@
 
 /* Page fade-in */
 @keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-up {
