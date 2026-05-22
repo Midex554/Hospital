@@ -1,5 +1,5 @@
 package com.medicore.hospital_backend.service;
-import com.medicore.hospital_backend.model.MedicalRecord;
+import com.medicore.hospital_backend.entity.MedicalRecord;
 import com.medicore.hospital_backend.model.Patient;
 import com.medicore.hospital_backend.repository.MedicalRecordRepository;
 import com.medicore.hospital_backend.repository.PatientRepository;

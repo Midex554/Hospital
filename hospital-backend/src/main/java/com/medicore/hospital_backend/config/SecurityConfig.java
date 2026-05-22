@@ -27,6 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -45,11 +46,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/appointments/**")
                         .hasAnyAuthority("ADMIN", "DOCTOR", "RECEPTIONIST")
 
-                        .requestMatchers("/api/medical_records/**")
+                        .requestMatchers("/api/medical-records/**")
                         .hasAnyAuthority("ADMIN", "DOCTOR")
 
                         .requestMatchers("/api/bills/**")
                         .hasAnyAuthority("ADMIN", "RECEPTIONIST")
+
+                        .requestMatchers("/api/dashboard/**")
+                        .hasAnyAuthority("ADMIN", "DOCTOR", "RECEPTIONIST")
 
                         .requestMatchers(
                                 "/swagger-ui/**",

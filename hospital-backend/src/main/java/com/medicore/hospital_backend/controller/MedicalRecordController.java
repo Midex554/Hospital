@@ -1,11 +1,11 @@
 package com.medicore.hospital_backend.controller;
-import com.medicore.hospital_backend.model.MedicalRecord;
+import com.medicore.hospital_backend.entity.MedicalRecord;
 import com.medicore.hospital_backend.service.MedicalRecordService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@RequestMapping("/api/medical_records")
+@RequestMapping("/api/medical-records")
 @CrossOrigin("*")
 
 public class MedicalRecordController {
