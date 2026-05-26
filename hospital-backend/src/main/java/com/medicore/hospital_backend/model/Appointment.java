@@ -21,6 +21,8 @@ public class Appointment {
 
     private LocalDateTime appointmentDate;
 
+    private String complaint;
+
     private String status = "Pending";
 
     @Column(columnDefinition = "TEXT")

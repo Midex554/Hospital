@@ -4,7 +4,6 @@ import com.medicore.hospital_backend.model.Appointment;
 import com.medicore.hospital_backend.model.Doctor;
 import com.medicore.hospital_backend.model.Patient;
 import com.medicore.hospital_backend.repository.AppointmentRepository;
-import com.medicore.hospital_backend.repository.DoctorRepository;
 import com.medicore.hospital_backend.repository.PatientRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,36 +14,57 @@ public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
-    private final DoctorRepository doctorRepository;
+    private final DoctorAssignmentService doctorAssignmentService;
 
     public AppointmentService(
             AppointmentRepository appointmentRepository,
             PatientRepository patientRepository,
-            DoctorRepository doctorRepository
+            DoctorAssignmentService doctorAssignmentService
     ) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
-        this.doctorRepository = doctorRepository;
+        this.doctorAssignmentService = doctorAssignmentService;
     }
 
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
+    public List<Appointment> getAppointmentsByPatient(Long patientId) {
+        return appointmentRepository.findByPatientId(patientId);
+    }
 
-
+    public List<Appointment> getAppointmentsByDoctor(Long doctorId) {
+        return appointmentRepository.findByDoctorId(doctorId);
+    }
 
     public Appointment createAppointment(Appointment appointment) {
+        if (appointment.getPatient() == null || appointment.getPatient().getId() == null) {
+            throw new RuntimeException("Patient is required");
+        }
+
+        if (appointment.getComplaint() == null || appointment.getComplaint().trim().isEmpty()) {
+            throw new RuntimeException("Complaint is required for doctor assignment");
+        }
+
         Long patientId = appointment.getPatient().getId();
-        Long doctorId = appointment.getDoctor().getId();
 
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException(("Patient Not Found")));
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
 
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException(("Doctor Not Found")));
+        Doctor assignedDoctor = doctorAssignmentService.assignDoctor(
+                appointment.getComplaint()
+        );
+
+        if (assignedDoctor == null) {
+            throw new RuntimeException("No available doctor is currently on duty");
+        }
 
         appointment.setPatient(patient);
-        appointment.setDoctor(doctor);
+        appointment.setDoctor(assignedDoctor);
+
+        if (appointment.getStatus() == null || appointment.getStatus().isBlank()) {
+            appointment.setStatus("Pending");
+        }
 
         return appointmentRepository.save(appointment);
     }
@@ -53,6 +73,7 @@ public class AppointmentService {
         Appointment appointment = getAppointmentById(id);
 
         appointment.setAppointmentDate(appointmentDetails.getAppointmentDate());
+        appointment.setComplaint(appointmentDetails.getComplaint());
         appointment.setStatus(appointmentDetails.getStatus());
         appointment.setNotes(appointmentDetails.getNotes());
 

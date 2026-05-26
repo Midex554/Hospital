@@ -2,6 +2,8 @@ package com.medicore.hospital_backend.service;
 import com.medicore.hospital_backend.dto.LoginResponse;
 import com.medicore.hospital_backend.dto.RegisterResponse;
 import com.medicore.hospital_backend.model.User;
+import com.medicore.hospital_backend.model.Patient;
+import com.medicore.hospital_backend.repository.PatientRepository;
 import com.medicore.hospital_backend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.medicore.hospital_backend.dto.LoginResponse;
@@ -13,13 +15,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final PatientRepository patientRepository;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                        PatientRepository patientRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.patientRepository = patientRepository;
 
     }
 
@@ -48,7 +53,17 @@ public class AuthService {
         }
         String token = jwtService.generateToken(user);
 
-        return new LoginResponse(token, user.getEmail(), user.getRole());
+        Object userDetails = user;
+        if (user.getRole().name().equals("PATIENT")) {
+            Patient patient = patientRepository.findByEmail(email)
+                    .orElse(null);
+
+            if (patient != null) {
+                userDetails = patient;
+            }
+        }
+
+        return new LoginResponse(token, user.getRole().name(), userDetails);
     }
 
 }

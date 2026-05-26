@@ -37,14 +37,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**")
                         .hasAuthority("ADMIN")
 
-                        .requestMatchers("/api/doctors**")
-                        .hasAnyAuthority("ADMIN", "DOCTOR")
+                        .requestMatchers("/api/doctors**", "/api/doctors")
+                        .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
-                        .requestMatchers("/api/patients/**")
-                        .hasAnyAuthority("ADMIN", "DOCTOR", "RECEPTIONIST")
+                        .requestMatchers("/api/patients/**", "/api/patients")
+                        .hasAnyAuthority("ADMIN", "DOCTOR", "RECEPTIONIST", "ROLE_ADMIN")
 
-                        .requestMatchers("/api/appointments/**")
-                        .hasAnyAuthority("ADMIN", "DOCTOR", "RECEPTIONIST")
+                        .requestMatchers("/api/appointments/**", "/api/appointments")
+                        .hasAnyAuthority("ADMIN", "DOCTOR", "RECEPTIONIST", "PATIENT", "ROLE_ADMIN", "ROLE_DOCTOR", "ROLE_RECEPTIONIST", "ROLE_PATIENT")
 
                         .requestMatchers("/api/medical-records/**")
                         .hasAnyAuthority("ADMIN", "DOCTOR")
@@ -54,6 +54,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/dashboard/**")
                         .hasAnyAuthority("ADMIN", "DOCTOR", "RECEPTIONIST")
+
+                        .requestMatchers("/api/doctor-shifts/**", "/api/doctor-shifts")
+                        .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
                         .requestMatchers(
                                 "/swagger-ui/**",

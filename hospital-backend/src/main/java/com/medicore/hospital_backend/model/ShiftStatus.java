@@ -1,4 +1,7 @@
 package com.medicore.hospital_backend.model;
 
-public class ShiftStatus {
+public enum ShiftStatus {
+    ON_DUTY,
+    OFF_DUTY,
+    BREAK
 }
