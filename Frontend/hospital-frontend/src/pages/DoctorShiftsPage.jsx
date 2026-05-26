@@ -5,14 +5,12 @@ import {
   Search,
   Edit2,
   Trash2,
-  FileText,
-  Eye,
   RefreshCw,
   X,
-  ClipboardPlus,
+  Activity,
+  Clock,
+  CalendarDays,
   Stethoscope,
-  Users,
-  Pill,
 } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
 
@@ -21,29 +19,18 @@ const authHeader = () => ({
 });
 
 const EMPTY_FORM = {
-  patientId: "",
   doctorId: "",
-  diagnosis: "",
-  treatment: "",
-  prescription: "",
-  notes: "",
+  shiftDate: "",
+  startTime: "",
+  endTime: "",
+  status: "ON_DUTY",
 };
 
-const fullName = (person) =>
-  `${person?.firstName || ""} ${person?.lastName || ""}`.trim();
+const STATUSES = ["ON_DUTY", "BREAK", "OFF_DUTY"];
 
-const normalizeArray = (data) => {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.content)) return data.content;
-  if (Array.isArray(data?.data)) return data.data;
-  return [];
-};
-
-export default function MedicalRecordsPage() {
-  const [records, setRecords] = useState([]);
-  const [patients, setPatients] = useState([]);
+export default function DoctorShiftsPage() {
+  const [shifts, setShifts] = useState([]);
   const [doctors, setDoctors] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -52,30 +39,29 @@ export default function MedicalRecordsPage() {
 
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [delOpen, setDelOpen] = useState(false);
-  const [viewOpen, setViewOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+
+  const fullName = (doctor) =>
+    `${doctor?.firstName || ""} ${doctor?.lastName || ""}`.trim();
 
   const fetchAll = async () => {
     setLoading(true);
 
     try {
-      const [rRes, pRes, dRes] = await Promise.all([
-        api.get("/medical-records", { headers: authHeader() }),
-        api.get("/patients", { headers: authHeader() }),
+      const [sRes, dRes] = await Promise.all([
+        api.get("/doctor-shifts", { headers: authHeader() }),
         api.get("/doctors", { headers: authHeader() }),
       ]);
 
-      setRecords(normalizeArray(rRes.data));
-      setPatients(normalizeArray(pRes.data));
-      setDoctors(normalizeArray(dRes.data));
+      setShifts(Array.isArray(sRes.data) ? sRes.data : []);
+      setDoctors(Array.isArray(dRes.data) ? dRes.data : []);
     } catch (error) {
       setAlert({
         type: "error",
-        message:
-          error.response?.data?.message || "Failed to load medical records.",
+        message: error.response?.data?.message || "Failed to load shifts.",
       });
     } finally {
       setLoading(false);
@@ -88,63 +74,58 @@ export default function MedicalRecordsPage() {
 
   const stats = useMemo(() => {
     return {
-      records: records.length,
-      patients: new Set(records.map((r) => r.patient?.id).filter(Boolean)).size,
-      doctors: new Set(records.map((r) => r.doctor?.id).filter(Boolean)).size,
-      prescriptions: records.filter((r) => r.prescription).length,
+      total: shifts.length,
+      onDuty: shifts.filter((s) => s.status === "ON_DUTY").length,
+      break: shifts.filter((s) => s.status === "BREAK").length,
+      offDuty: shifts.filter((s) => s.status === "OFF_DUTY").length,
     };
-  }, [records]);
+  }, [shifts]);
 
   const filtered = useMemo(() => {
-    return records.filter((r) =>
+    return shifts.filter((shift) =>
       [
-        fullName(r.patient),
-        fullName(r.doctor),
-        r.diagnosis,
-        r.treatment,
-        r.prescription,
-        r.notes,
+        fullName(shift.doctor),
+        shift.doctor?.specialization,
+        shift.shiftDate,
+        shift.startTime,
+        shift.endTime,
+        shift.status,
       ]
         .join(" ")
         .toLowerCase()
         .includes(search.toLowerCase()),
     );
-  }, [records, search]);
+  }, [shifts, search]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-
     setForm((prev) => ({
       ...prev,
-      [name]: value,
+      [e.target.name]: e.target.value,
     }));
   };
 
   const toPayload = () => ({
-    diagnosis: form.diagnosis,
-    treatment: form.treatment,
-    prescription: form.prescription,
-    notes: form.notes,
-    patient: {
-      id: Number(form.patientId),
-    },
+    shiftDate: form.shiftDate,
+    startTime: form.startTime,
+    endTime: form.endTime,
+    status: form.status,
     doctor: {
       id: Number(form.doctorId),
     },
   });
 
   const validateForm = () => {
-    if (!form.patientId) return "Please select a patient.";
     if (!form.doctorId) return "Please select a doctor.";
-    if (!form.diagnosis.trim()) return "Diagnosis is required.";
-    if (!form.treatment.trim()) return "Treatment is required.";
+    if (!form.shiftDate) return "Please select shift date.";
+    if (!form.startTime) return "Please select start time.";
+    if (!form.endTime) return "Please select end time.";
+    if (!form.status) return "Please select status.";
     return null;
   };
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
-
+  const handleAdd = async () => {
     const errorMessage = validateForm();
+
     if (errorMessage) {
       setAlert({ type: "error", message: errorMessage });
       return;
@@ -153,47 +134,43 @@ export default function MedicalRecordsPage() {
     setSaving(true);
 
     try {
-      const res = await api.post("/medical-records", toPayload(), {
+      const res = await api.post("/doctor-shifts", toPayload(), {
         headers: authHeader(),
       });
 
-      setRecords((prev) => [...prev, res.data]);
-      setAlert({ type: "success", message: "Medical record created." });
-
+      setShifts((prev) => [...prev, res.data]);
+      setAlert({ type: "success", message: "Doctor shift created." });
       setAddOpen(false);
       setForm(EMPTY_FORM);
     } catch (error) {
       setAlert({
         type: "error",
-        message:
-          error.response?.data?.message || "Failed to create medical record.",
+        message: error.response?.data?.message || "Failed to create shift.",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const openEdit = (record) => {
-    setSelected(record);
+  const openEdit = (shift) => {
+    setSelected(shift);
 
     setForm({
-      patientId: record.patient?.id?.toString() || "",
-      doctorId: record.doctor?.id?.toString() || "",
-      diagnosis: record.diagnosis || "",
-      treatment: record.treatment || "",
-      prescription: record.prescription || "",
-      notes: record.notes || "",
+      doctorId: shift.doctor?.id?.toString() || "",
+      shiftDate: shift.shiftDate || "",
+      startTime: shift.startTime || "",
+      endTime: shift.endTime || "",
+      status: shift.status || "ON_DUTY",
     });
 
     setEditOpen(true);
   };
 
-  const handleEdit = async (e) => {
-    e.preventDefault();
-
+  const handleEdit = async () => {
     if (!selected) return;
 
     const errorMessage = validateForm();
+
     if (errorMessage) {
       setAlert({ type: "error", message: errorMessage });
       return;
@@ -202,37 +179,31 @@ export default function MedicalRecordsPage() {
     setSaving(true);
 
     try {
-      const res = await api.put(
-        `/medical-records/${selected.id}`,
-        toPayload(),
-        {
-          headers: authHeader(),
-        },
+      const res = await api.put(`/doctor-shifts/${selected.id}`, toPayload(), {
+        headers: authHeader(),
+      });
+
+      setShifts((prev) =>
+        prev.map((shift) => (shift.id === selected.id ? res.data : shift)),
       );
 
-      setRecords((prev) =>
-        prev.map((record) => (record.id === selected.id ? res.data : record)),
-      );
-
-      setAlert({ type: "success", message: "Medical record updated." });
-
+      setAlert({ type: "success", message: "Doctor shift updated." });
       setEditOpen(false);
       setSelected(null);
       setForm(EMPTY_FORM);
     } catch (error) {
       setAlert({
         type: "error",
-        message:
-          error.response?.data?.message || "Failed to update medical record.",
+        message: error.response?.data?.message || "Failed to update shift.",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const openDelete = (record) => {
-    setSelected(record);
-    setDelOpen(true);
+  const openDelete = (shift) => {
+    setSelected(shift);
+    setDeleteOpen(true);
   };
 
   const handleDelete = async () => {
@@ -241,98 +212,96 @@ export default function MedicalRecordsPage() {
     setSaving(true);
 
     try {
-      await api.delete(`/medical-records/${selected.id}`, {
+      await api.delete(`/doctor-shifts/${selected.id}`, {
         headers: authHeader(),
       });
 
-      setRecords((prev) => prev.filter((record) => record.id !== selected.id));
-
-      setAlert({ type: "success", message: "Medical record deleted." });
-
-      setDelOpen(false);
+      setShifts((prev) => prev.filter((shift) => shift.id !== selected.id));
+      setAlert({ type: "success", message: "Doctor shift deleted." });
+      setDeleteOpen(false);
       setSelected(null);
     } catch (error) {
       setAlert({
         type: "error",
-        message:
-          error.response?.data?.message || "Failed to delete medical record.",
+        message: error.response?.data?.message || "Failed to delete shift.",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const openView = (record) => {
-    setSelected(record);
-    setViewOpen(true);
-  };
-
   return (
-    <DashboardLayout title="Medical Records">
+    <DashboardLayout title="Doctor Shifts">
+      {alert && (
+        <AlertModal
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
+
       <div className="max-w-[1400px] mx-auto space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard
-            icon={FileText}
-            label="Total Records"
-            value={stats.records}
-            sub="Stored medical files"
+            icon={CalendarDays}
+            label="Total Shifts"
+            value={stats.total}
+            sub="All assigned shifts"
             color="blue"
           />
 
           <StatCard
-            icon={Users}
-            label="Patients Covered"
-            value={stats.patients}
-            sub="Patients with records"
-            color="cyan"
+            icon={Activity}
+            label="On Duty"
+            value={stats.onDuty}
+            sub="Available doctors"
+            color="green"
+          />
+
+          <StatCard
+            icon={Clock}
+            label="On Break"
+            value={stats.break}
+            sub="Temporarily unavailable"
+            color="yellow"
           />
 
           <StatCard
             icon={Stethoscope}
-            label="Doctors"
-            value={stats.doctors}
-            sub="Doctors involved"
-            color="purple"
-          />
-
-          <StatCard
-            icon={Pill}
-            label="Prescriptions"
-            value={stats.prescriptions}
-            sub="Records with prescriptions"
-            color="green"
+            label="Off Duty"
+            value={stats.offDuty}
+            sub="Not available"
+            color="red"
           />
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
           <div>
             <h2 className="text-lg font-extrabold text-slate-800">
-              Medical Records
+              Doctor Shifts
             </h2>
             <p className="text-xs text-slate-400">
-              Manage diagnosis, treatment, prescriptions, and doctor notes
+              Manage doctor availability and duty schedules
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              type="button"
               onClick={fetchAll}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 cursor-pointer transition"
+              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 cursor-pointer"
             >
               <RefreshCw size={16} />
             </button>
 
             <button
-              type="button"
               onClick={() => {
                 setForm(EMPTY_FORM);
                 setAddOpen(true);
               }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer"
             >
               <Plus size={16} />
-              Add Record
+              Add Shift
             </button>
           </div>
         </div>
@@ -346,30 +315,31 @@ export default function MedicalRecordsPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by patient, doctor, diagnosis, treatment..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition"
+            placeholder="Search by doctor, specialization, date, time, status..."
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm"
           />
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[1100px]">
+            <table className="w-full text-sm min-w-[1000px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   {[
                     "#",
-                    "Patient",
                     "Doctor",
-                    "Diagnosis",
-                    "Treatment",
-                    "Prescription",
+                    "Specialization",
+                    "Date",
+                    "Start",
+                    "End",
+                    "Status",
                     "Actions",
-                  ].map((heading) => (
+                  ].map((h) => (
                     <th
-                      key={heading}
+                      key={h}
                       className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap"
                     >
-                      {heading}
+                      {h}
                     </th>
                   ))}
                 </tr>
@@ -378,23 +348,20 @@ export default function MedicalRecordsPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="p-10 text-center text-slate-500">
-                      Loading records...
+                    <td colSpan="8" className="p-10 text-center text-slate-500">
+                      Loading shifts...
                     </td>
                   </tr>
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-12">
-                      <EmptyState
-                        title="No medical records found"
-                        text="Try adjusting your search or create a new medical record."
-                      />
+                    <td colSpan="8" className="p-12">
+                      <EmptyState />
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((record, index) => (
+                  filtered.map((shift, index) => (
                     <tr
-                      key={record.id}
+                      key={shift.id}
                       className="border-b border-slate-50 hover:bg-blue-50/40 hover:scale-[1.002] transition-all duration-200"
                     >
                       <td className="px-4 py-3 text-slate-400 font-mono text-xs">
@@ -402,47 +369,41 @@ export default function MedicalRecordsPage() {
                       </td>
 
                       <td className="px-4 py-3 font-semibold text-slate-800">
-                        {fullName(record.patient) || "—"}
+                        Dr. {fullName(shift.doctor) || "—"}
                       </td>
 
                       <td className="px-4 py-3 text-slate-600">
-                        {fullName(record.doctor) || "—"}
+                        {shift.doctor?.specialization || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[190px] truncate">
-                        {record.diagnosis || "—"}
+                      <td className="px-4 py-3 text-slate-600">
+                        {shift.shiftDate || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[190px] truncate">
-                        {record.treatment || "—"}
+                      <td className="px-4 py-3 text-slate-600">
+                        {shift.startTime || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[230px] truncate">
-                        {record.prescription || "—"}
+                      <td className="px-4 py-3 text-slate-600">
+                        {shift.endTime || "—"}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <StatusBadge status={shift.status} />
                       </td>
 
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <button
-                            type="button"
-                            onClick={() => openView(record)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-600 cursor-pointer transition"
-                          >
-                            <Eye size={15} />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => openEdit(record)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-green-100 text-slate-600 hover:text-green-600 cursor-pointer transition"
+                            onClick={() => openEdit(shift)}
+                            className="p-2 rounded-lg bg-slate-100 hover:bg-green-100 text-slate-600 hover:text-green-600 cursor-pointer"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
-                            type="button"
-                            onClick={() => openDelete(record)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-600 hover:text-red-600 cursor-pointer transition"
+                            onClick={() => openDelete(shift)}
+                            className="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-600 hover:text-red-600 cursor-pointer"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -458,7 +419,7 @@ export default function MedicalRecordsPage() {
           {!loading && filtered.length > 0 && (
             <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400 flex justify-between">
               <span>
-                Showing {filtered.length} of {records.length} medical records
+                Showing {filtered.length} of {shifts.length} doctor shifts
               </span>
               <span>Page 1</span>
             </div>
@@ -469,93 +430,60 @@ export default function MedicalRecordsPage() {
       <Drawer
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        title="Add Medical Record"
-        subtitle="Create a new clinical record"
+        title="Add Doctor Shift"
+        subtitle="Assign doctor duty schedule"
       >
-        <RecordForm
+        <ShiftForm
           form={form}
-          patients={patients}
           doctors={doctors}
-          saving={saving}
           onChange={handleChange}
           onSubmit={handleAdd}
-          submitLabel="Create Record"
+          saving={saving}
+          submitLabel="Create Shift"
+          fullName={fullName}
         />
       </Drawer>
 
       <Drawer
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        title="Edit Medical Record"
-        subtitle="Update clinical record information"
+        title="Edit Doctor Shift"
+        subtitle="Update doctor availability"
       >
-        <RecordForm
+        <ShiftForm
           form={form}
-          patients={patients}
           doctors={doctors}
-          saving={saving}
           onChange={handleChange}
           onSubmit={handleEdit}
+          saving={saving}
           submitLabel="Save Changes"
+          fullName={fullName}
         />
       </Drawer>
 
-      <Drawer
-        open={viewOpen}
-        onClose={() => setViewOpen(false)}
-        title="Medical Record Details"
-        subtitle="View diagnosis, treatment, and prescription"
-      >
-        {selected && (
-          <div className="space-y-3 text-sm">
-            <Detail label="Patient" value={fullName(selected.patient)} />
-            <Detail label="Doctor" value={fullName(selected.doctor)} />
-            <Detail label="Diagnosis" value={selected.diagnosis} />
-            <Detail label="Treatment" value={selected.treatment} />
-            <Detail label="Prescription" value={selected.prescription} />
-            <Detail label="Notes" value={selected.notes} />
-          </div>
-        )}
-      </Drawer>
-
       <ConfirmModal
-        open={delOpen}
-        onClose={() => setDelOpen(false)}
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
         loading={saving}
-        title="Delete Medical Record"
-        message="Delete this medical record permanently?"
+        title="Delete Shift"
+        message="Are you sure you want to delete this doctor shift?"
       />
     </DashboardLayout>
   );
 }
 
-function RecordForm({
+function ShiftForm({
   form,
-  patients,
   doctors,
-  saving,
   onChange,
   onSubmit,
+  saving,
   submitLabel,
+  fullName,
 }) {
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <FormSelect
-        label="Patient"
-        name="patientId"
-        value={form.patientId}
-        onChange={onChange}
-      >
-        <option value="">Select patient</option>
-
-        {patients.map((patient) => (
-          <option key={patient.id} value={patient.id}>
-            {fullName(patient)}
-          </option>
-        ))}
-      </FormSelect>
-
+    <div className="space-y-4">
       <FormSelect
         label="Doctor"
         name="doctorId"
@@ -566,61 +494,67 @@ function RecordForm({
 
         {doctors.map((doctor) => (
           <option key={doctor.id} value={doctor.id}>
-            {fullName(doctor)}{" "}
-            {doctor.specialization ? `- ${doctor.specialization}` : ""}
+            Dr. {fullName(doctor)}
+            {doctor.specialization ? ` - ${doctor.specialization}` : ""}
           </option>
         ))}
       </FormSelect>
 
-      <FormTextarea
-        label="Diagnosis"
-        name="diagnosis"
-        value={form.diagnosis}
+      <FormInput
+        label="Shift Date"
+        name="shiftDate"
+        type="date"
+        value={form.shiftDate}
         onChange={onChange}
-        placeholder="Enter diagnosis"
       />
 
-      <FormTextarea
-        label="Treatment"
-        name="treatment"
-        value={form.treatment}
+      <FormInput
+        label="Start Time"
+        name="startTime"
+        type="time"
+        value={form.startTime}
         onChange={onChange}
-        placeholder="Enter treatment plan"
       />
 
-      <FormTextarea
-        label="Prescription"
-        name="prescription"
-        value={form.prescription}
+      <FormInput
+        label="End Time"
+        name="endTime"
+        type="time"
+        value={form.endTime}
         onChange={onChange}
-        placeholder="Enter prescription"
       />
 
-      <FormTextarea
-        label="Doctor Notes"
-        name="notes"
-        value={form.notes}
+      <FormSelect
+        label="Status"
+        name="status"
+        value={form.status}
         onChange={onChange}
-        placeholder="Additional notes"
-      />
+      >
+        {STATUSES.map((status) => (
+          <option key={status} value={status}>
+            {status.replace("_", " ")}
+          </option>
+        ))}
+      </FormSelect>
 
       <button
-        type="submit"
+        type="button"
+        onClick={onSubmit}
         disabled={saving}
         className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition disabled:opacity-50 cursor-pointer"
       >
         {saving ? "Saving..." : submitLabel}
       </button>
-    </form>
+    </div>
   );
 }
 
 function StatCard({ icon: Icon, label, value, sub, color }) {
   const colors = {
     blue: "from-blue-600 to-blue-800",
-    cyan: "from-cyan-500 to-blue-600",
-    purple: "from-violet-500 to-purple-700",
     green: "from-emerald-500 to-teal-700",
+    yellow: "from-amber-500 to-yellow-600",
+    red: "from-rose-500 to-red-700",
   };
 
   return (
@@ -640,32 +574,54 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   );
 }
 
-function EmptyState({ title, text }) {
+function StatusBadge({ status }) {
+  const cls =
+    status === "ON_DUTY"
+      ? "bg-green-100 text-green-700 border-green-200"
+      : status === "BREAK"
+        ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+        : "bg-red-100 text-red-700 border-red-200";
+
+  return (
+    <span
+      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${cls}`}
+    >
+      {status?.replace("_", " ") || "—"}
+    </span>
+  );
+}
+
+function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center text-center">
       <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
-        <ClipboardPlus size={22} />
+        <Activity size={22} />
       </div>
-      <h3 className="text-sm font-bold text-slate-700">{title}</h3>
-      <p className="text-xs text-slate-400 mt-1">{text}</p>
+
+      <h3 className="text-sm font-bold text-slate-700">
+        No doctor shifts found
+      </h3>
+
+      <p className="text-xs text-slate-400 mt-1">
+        Assign doctors to shifts so the system can detect who is on duty.
+      </p>
     </div>
   );
 }
 
-function FormTextarea({ label, name, value, onChange, placeholder }) {
+function FormInput({ label, name, value, onChange, type = "text" }) {
   return (
     <div>
       <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
         {label}
       </label>
 
-      <textarea
+      <input
+        type={type}
         name={name}
         value={value}
         onChange={onChange}
-        placeholder={placeholder}
-        rows={4}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       />
     </div>
   );
@@ -690,20 +646,6 @@ function FormSelect({ label, name, value, onChange, children }) {
   );
 }
 
-function Detail({ label, value }) {
-  return (
-    <div className="bg-slate-50 rounded-xl px-3 py-3">
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
-        {label}
-      </p>
-
-      <p className="text-slate-700 font-medium mt-1 whitespace-pre-wrap">
-        {value || "—"}
-      </p>
-    </div>
-  );
-}
-
 function Drawer({ open, onClose, title, subtitle, children }) {
   if (!open) return null;
 
@@ -717,7 +659,6 @@ function Drawer({ open, onClose, title, subtitle, children }) {
           </div>
 
           <button
-            type="button"
             onClick={onClose}
             className="w-9 h-9 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
           >
@@ -759,6 +700,38 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
             {loading ? "Deleting..." : "Delete"}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AlertModal({ type, message, onClose }) {
+  const ok = type === "success";
+
+  return (
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[9999] px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[400px] p-6 text-center">
+        <h2
+          className={`text-xl font-extrabold mb-3 ${
+            ok ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {ok ? "Success" : "Error"}
+        </h2>
+
+        <p className="text-sm text-slate-600 mb-6">{message}</p>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className={`px-5 py-2 rounded-xl text-white ${
+            ok
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-red-600 hover:bg-red-700"
+          }`}
+        >
+          OK
+        </button>
       </div>
     </div>
   );

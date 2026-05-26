@@ -23,43 +23,52 @@ function FeatureBadge({ icon: Icon, text }) {
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const goByRole = (role) => {
     if (role === "ADMIN") navigate("/admin");
     else if (role === "DOCTOR") navigate("/doctor");
     else if (role === "RECEPTIONIST") navigate("/receptionist");
-    else navigate("/");
+    else if (role === "PATIENT") navigate("/patient");
+    else navigate("/admin");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
-    setMessage(null);
+    setError("");
 
     try {
       const res = await api.post("/auth/login", form);
-      const { token, role } = res.data;
+
+      const { token, role, user } = res.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
 
-      setMessage({ type: "success", text: "Login successful" });
-      setTimeout(() => goByRole(role), 900);
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      goByRole(role);
     } catch (err) {
-      setMessage({
-        type: "error",
-        text:
-          err.response?.data?.message ||
-          "Invalid credentials. Please try again.",
-      });
+      setError(err.response?.data?.message || "Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -67,25 +76,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex font-sans">
-      {message && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white p-8 rounded-2xl w-full max-w-[400px] text-center shadow-xl">
-            <h2
-              className={`text-2xl font-bold mb-4 ${message.type === "success" ? "text-green-600" : "text-red-600"}`}
-            >
-              {message.type === "success" ? "Success" : "Error"}
-            </h2>
-            <p className="text-slate-600 mb-6">{message.text}</p>
-            <button
-              onClick={() => setMessage(null)}
-              className={`px-5 py-2 rounded-xl text-white cursor-pointer ${message.type === "success" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="hidden lg:flex flex-col justify-between w-[52%] bg-gradient-to-br from-[#0a1628] via-[#0d2244] to-[#0a3060] px-14 py-12 relative overflow-hidden">
         <div className="absolute top-[-80px] left-[-80px] w-80 h-80 rounded-full bg-blue-600/20 blur-3xl" />
         <div className="absolute bottom-[-60px] right-[-60px] w-96 h-96 rounded-full bg-cyan-500/15 blur-3xl" />
@@ -104,6 +94,7 @@ export default function LoginPage() {
           <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-xl shadow-blue-900/50">
             <Stethoscope size={22} className="text-white" />
           </div>
+
           <div>
             <p className="text-white font-extrabold text-xl tracking-tight">
               MediCore
@@ -125,6 +116,7 @@ export default function LoginPage() {
               <br />
               Simplified.
             </h1>
+
             <p className="mt-4 text-white/60 text-base leading-relaxed max-w-sm">
               A unified platform for patient management, appointments, billing,
               and clinical records — all in one place.
@@ -144,74 +136,182 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <div className="flex flex-1 items-center justify-center bg-slate-50 px-6 py-12">
-        <div className="w-full max-w-[400px]">
-          <div className="flex lg:hidden items-center gap-2.5 mb-8">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
-              <Stethoscope size={18} className="text-white" />
-            </div>
-            <span className="text-slate-800 font-extrabold text-lg">
-              MediCore HMS
-            </span>
+      <div className="flex flex-1 items-center justify-center px-6 py-12 relative overflow-hidden bg-gradient-to-br from-[#07111f] via-[#0b1d3a] to-[#07111f] lg:bg-slate-50">
+        <div className="absolute inset-0 lg:hidden">
+          <div className="absolute top-[-80px] right-[-80px] w-72 h-72 rounded-full bg-cyan-500/25 blur-3xl" />
+          <div className="absolute bottom-[-80px] left-[-80px] w-80 h-80 rounded-full bg-blue-600/30 blur-3xl" />
+          <div className="absolute top-1/3 left-1/2 w-52 h-52 rounded-full bg-indigo-500/10 blur-3xl" />
+
+          <div
+            className="absolute inset-0 opacity-[0.05]"
+            style={{
+              backgroundImage:
+                "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+              backgroundSize: "36px 36px",
+            }}
+          />
+
+          <div className="absolute top-20 left-10 w-2 h-2 rounded-full bg-cyan-300 animate-pulse" />
+          <div className="absolute top-40 right-16 w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping" />
+          <div className="absolute bottom-32 left-16 w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-1.5 h-1.5 rounded-full bg-blue-300 animate-ping" />
+        </div>
+
+        <div className="absolute -inset-10 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none lg:hidden" />
+
+        <div
+          className="
+            w-full
+            max-w-[400px]
+            relative
+            bg-white/[0.08]
+            lg:bg-transparent
+            border
+            border-white/10
+            lg:border-transparent
+            backdrop-blur-2xl
+            lg:backdrop-blur-none
+            rounded-[32px]
+            lg:rounded-none
+            p-7
+            lg:p-0
+            overflow-hidden
+            shadow-[0_8px_40px_rgba(0,0,0,0.35)]
+            lg:shadow-none
+            before:absolute
+            before:inset-0
+            before:rounded-[32px]
+            before:bg-gradient-to-br
+            before:from-white/10
+            before:to-transparent
+            before:pointer-events-none
+            lg:before:hidden
+          "
+        >
+          <div className="absolute inset-[1px] rounded-[31px] border border-cyan-400/10 pointer-events-none lg:hidden" />
+
+          <div className="absolute inset-0 opacity-[0.06] pointer-events-none lg:hidden">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage:
+                  "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+                backgroundSize: "28px 28px",
+              }}
+            />
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">
-              Welcome back
-            </h2>
-            <p className="text-slate-500 text-sm mt-1">
-              Sign in to your workspace
-            </p>
-          </div>
+          <div className="absolute top-[-40px] right-[-40px] w-40 h-40 rounded-full bg-cyan-400/20 blur-3xl lg:hidden" />
+          <div className="absolute bottom-[-40px] left-[-40px] w-40 h-40 rounded-full bg-blue-500/20 blur-3xl lg:hidden" />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 outline-none transition-all hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-              />
+          <div className="relative">
+            <div className="flex lg:hidden items-center gap-2.5 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_25px_rgba(34,211,238,0.45)]">
+                <Stethoscope size={18} className="text-white" />
+              </div>
+              <span className="text-white font-extrabold text-lg">
+                MediCore HMS
+              </span>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                Password
-              </label>
-              <div className="relative">
+            <div className="mb-8">
+              <h2 className="text-3xl lg:text-2xl font-extrabold text-white lg:text-slate-800 tracking-tight">
+                Welcome back
+              </h2>
+              <p className="text-white/60 lg:text-slate-500 text-sm mt-1">
+                Sign in to your workspace
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-white/60 lg:text-slate-500 uppercase tracking-widest">
+                  Email
+                </label>
+
                 <input
-                  type={showPw ? "text" : "password"}
-                  name="password"
-                  value={form.password}
+                  type="email"
+                  name="email"
+                  value={form.email}
                   onChange={handleChange}
-                  placeholder="Enter your password"
+                  placeholder="Enter your email"
                   required
-                  className="w-full px-4 py-3 pr-11 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 outline-none transition-all hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 lg:border-slate-200 bg-white/10 lg:bg-white text-white lg:text-slate-800 placeholder-white/40 lg:placeholder-slate-400 outline-none transition-all hover:border-cyan-400/40 lg:hover:border-slate-300 focus:border-cyan-400 lg:focus:border-blue-500 focus:ring-4 focus:ring-cyan-400/20 lg:focus:ring-blue-500/10 shadow-inner shadow-black/20 lg:shadow-none"
                 />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-white/60 lg:text-slate-500 uppercase tracking-widest">
+                  Password
+                </label>
+
+                <div className="relative">
+                  <input
+                    type={showPw ? "text" : "password"}
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    placeholder="Enter your password"
+                    required
+                    className="w-full px-4 py-3 pr-11 rounded-xl border border-white/10 lg:border-slate-200 bg-white/10 lg:bg-white text-white lg:text-slate-800 placeholder-white/40 lg:placeholder-slate-400 outline-none transition-all hover:border-cyan-400/40 lg:hover:border-slate-300 focus:border-cyan-400 lg:focus:border-blue-500 focus:ring-4 focus:ring-cyan-400/20 lg:focus:ring-blue-500/10 shadow-inner shadow-black/20 lg:shadow-none"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 lg:text-slate-400 hover:text-cyan-300 lg:hover:text-slate-600 cursor-pointer"
+                  >
+                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-400/20 text-red-200 lg:bg-red-50 lg:border-red-200 lg:text-red-600 text-xs px-3.5 py-2.5 rounded-xl">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="
+                  w-full
+                  py-3.5
+                  rounded-2xl
+                  bg-gradient-to-r
+                  from-blue-500
+                  via-cyan-500
+                  to-blue-600
+                  hover:scale-[1.02]
+                  active:scale-[0.98]
+                  text-white
+                  font-bold
+                  text-sm
+                  transition-all
+                  duration-300
+                  shadow-[0_0_25px_rgba(59,130,246,0.55)]
+                  hover:shadow-[0_0_35px_rgba(34,211,238,0.75)]
+                  disabled:opacity-60
+                  disabled:cursor-not-allowed
+                  cursor-pointer
+                "
+              >
+                {loading ? "Signing in…" : "Sign In →"}
+              </button>
+
+              <p className="text-sm text-center mt-5 text-white/60 lg:text-slate-500">
+                Don’t have a patient account?{" "}
                 <button
                   type="button"
-                  onClick={() => setShowPw((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  onClick={() => navigate("/patient-register")}
+                  className="text-cyan-400 lg:text-blue-600 font-bold hover:underline"
                 >
-                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  Create Account
                 </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {loading ? "Signing in…" : "Sign In →"}
-            </button>
-          </form>
+              </p>
+            </form>
+          </div>
         </div>
       </div>
     </div>

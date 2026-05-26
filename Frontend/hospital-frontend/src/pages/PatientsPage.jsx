@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/api";
-import { Plus, Search, Edit2, Trash2, User, RefreshCw, X } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  User,
+  RefreshCw,
+  X,
+  Users,
+  Mars,
+  Venus,
+  Droplet,
+} from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
 
 const authHeader = () => ({
@@ -58,6 +70,25 @@ function PatientsPage() {
     fetchPatients();
   }, []);
 
+  const stats = useMemo(() => {
+    const male = patients.filter(
+      (p) => p.gender?.toLowerCase() === "male",
+    ).length;
+
+    const female = patients.filter(
+      (p) => p.gender?.toLowerCase() === "female",
+    ).length;
+
+    const bloodGroups = patients.filter((p) => p.bloodGroup).length;
+
+    return {
+      total: patients.length,
+      male,
+      female,
+      bloodGroups,
+    };
+  }, [patients]);
+
   const filtered = useMemo(() => {
     return patients.filter((p) =>
       [p.firstName, p.lastName, p.email, p.phone, p.bloodGroup, p.gender]
@@ -84,6 +115,7 @@ function PatientsPage() {
 
       setPatients((prev) => [...prev, res.data]);
       setAlert({ type: "success", message: "Patient added successfully." });
+
       setAddOpen(false);
       setForm(EMPTY_FORM);
     } catch (error) {
@@ -127,6 +159,7 @@ function PatientsPage() {
       );
 
       setAlert({ type: "success", message: "Patient updated successfully." });
+
       setEditOpen(false);
       setSelected(null);
     } catch (error) {
@@ -157,6 +190,7 @@ function PatientsPage() {
       setPatients((prev) => prev.filter((p) => p.id !== selected.id));
 
       setAlert({ type: "success", message: "Patient deleted successfully." });
+
       setDelOpen(false);
       setSelected(null);
     } catch (error) {
@@ -185,12 +219,46 @@ function PatientsPage() {
         />
       )}
 
-      <div className="space-y-5">
+      <div className="max-w-[1400px] mx-auto space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <StatCard
+            icon={Users}
+            label="Total Patients"
+            value={stats.total}
+            sub="Registered patients"
+            color="blue"
+          />
+
+          <StatCard
+            icon={Mars}
+            label="Male Patients"
+            value={stats.male}
+            sub="Male records"
+            color="cyan"
+          />
+
+          <StatCard
+            icon={Venus}
+            label="Female Patients"
+            value={stats.female}
+            sub="Female records"
+            color="purple"
+          />
+
+          <StatCard
+            icon={Droplet}
+            label="Blood Groups"
+            value={stats.bloodGroups}
+            sub="With blood data"
+            color="red"
+          />
+        </div>
+
         <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
           <div>
             <h2 className="text-lg font-extrabold text-slate-800">Patients</h2>
             <p className="text-xs text-slate-400">
-              {patients.length} registered patients
+              Manage patient biodata and hospital records
             </p>
           </div>
 
@@ -207,7 +275,7 @@ function PatientsPage() {
                 setForm(EMPTY_FORM);
                 setAddOpen(true);
               }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200"
             >
               <Plus size={16} />
               Add Patient
@@ -225,7 +293,7 @@ function PatientsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, email, phone, blood group..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm"
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition"
           />
         </div>
 
@@ -256,21 +324,24 @@ function PatientsPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="p-6 text-center text-slate-500">
+                    <td colSpan="7" className="p-10 text-center text-slate-500">
                       Loading patients...
                     </td>
                   </tr>
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-slate-500">
-                      No patients found.
+                    <td colSpan="7" className="p-12">
+                      <EmptyState
+                        title="No patients found"
+                        text="Try adjusting your search or add a new patient record."
+                      />
                     </td>
                   </tr>
                 ) : (
                   filtered.map((patient, index) => (
                     <tr
                       key={patient.id}
-                      className="border-b border-slate-50 hover:bg-blue-50/40 transition group"
+                      className="border-b border-slate-50 hover:bg-blue-50/40 hover:scale-[1.002] transition-all duration-200 group"
                     >
                       <td className="px-4 py-3 text-slate-400 font-mono text-xs">
                         {index + 1}
@@ -293,8 +364,8 @@ function PatientsPage() {
                         </div>
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
-                        {patient.gender || "—"}
+                      <td className="px-4 py-3">
+                        <GenderBadge gender={patient.gender} />
                       </td>
 
                       <td className="px-4 py-3 text-slate-600">
@@ -311,7 +382,7 @@ function PatientsPage() {
                         )}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 max-w-[280px] truncate">
                         {patient.address || "—"}
                       </td>
 
@@ -347,17 +418,21 @@ function PatientsPage() {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400">
-              Showing {filtered.length} of {patients.length} patients
+            <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400 flex justify-between">
+              <span>
+                Showing {filtered.length} of {patients.length} patients
+              </span>
+              <span>Page 1</span>
             </div>
           )}
         </div>
       </div>
 
-      <Modal
+      <Drawer
         open={addOpen}
         onClose={() => setAddOpen(false)}
         title="Add New Patient"
+        subtitle="Create a new patient profile"
       >
         <PatientForm
           form={form}
@@ -366,12 +441,13 @@ function PatientsPage() {
           submitLabel="Add Patient"
           saving={saving}
         />
-      </Modal>
+      </Drawer>
 
-      <Modal
+      <Drawer
         open={editOpen}
         onClose={() => setEditOpen(false)}
         title="Edit Patient"
+        subtitle="Update patient information"
       >
         <PatientForm
           form={form}
@@ -380,12 +456,13 @@ function PatientsPage() {
           submitLabel="Save Changes"
           saving={saving}
         />
-      </Modal>
+      </Drawer>
 
-      <Modal
+      <Drawer
         open={viewOpen}
         onClose={() => setViewOpen(false)}
         title="Patient Details"
+        subtitle="View patient information"
       >
         {selected && (
           <div className="space-y-4">
@@ -412,7 +489,7 @@ function PatientsPage() {
             </div>
           </div>
         )}
-      </Modal>
+      </Drawer>
 
       <ConfirmModal
         open={delOpen}
@@ -429,7 +506,7 @@ function PatientsPage() {
 function PatientForm({ form, handleChange, onSubmit, submitLabel, saving }) {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3">
         <FormInput
           label="First Name"
           name="firstName"
@@ -488,15 +565,13 @@ function PatientForm({ form, handleChange, onSubmit, submitLabel, saving }) {
           placeholder="email@example.com"
         />
 
-        <div className="md:col-span-2">
-          <FormInput
-            label="Address"
-            name="address"
-            value={form.address}
-            onChange={handleChange}
-            placeholder="Address"
-          />
-        </div>
+        <FormInput
+          label="Address"
+          name="address"
+          value={form.address}
+          onChange={handleChange}
+          placeholder="Address"
+        />
       </div>
 
       <button
@@ -506,6 +581,65 @@ function PatientForm({ form, handleChange, onSubmit, submitLabel, saving }) {
       >
         {saving ? "Saving..." : submitLabel}
       </button>
+    </div>
+  );
+}
+
+function StatCard({ icon: Icon, label, value, sub, color }) {
+  const colors = {
+    blue: "from-blue-600 to-blue-800",
+    cyan: "from-cyan-500 to-blue-600",
+    purple: "from-violet-500 to-purple-700",
+    red: "from-rose-500 to-red-700",
+  };
+
+  return (
+    <div
+      className={`bg-gradient-to-br ${
+        colors[color] || colors.blue
+      } rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
+    >
+      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+        <Icon size={20} />
+      </div>
+
+      <p className="text-sm text-white/80">{label}</p>
+      <h3 className="text-2xl font-extrabold mt-1">{value}</h3>
+      <p className="text-xs text-white/70 mt-1">{sub}</p>
+    </div>
+  );
+}
+
+function GenderBadge({ gender }) {
+  const value = gender?.toLowerCase();
+
+  if (value === "male") {
+    return (
+      <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg text-xs font-semibold">
+        Male
+      </span>
+    );
+  }
+
+  if (value === "female") {
+    return (
+      <span className="bg-pink-50 text-pink-600 px-2.5 py-1 rounded-lg text-xs font-semibold">
+        Female
+      </span>
+    );
+  }
+
+  return <span className="text-slate-400">—</span>;
+}
+
+function EmptyState({ title, text }) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center">
+      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+        <User size={22} />
+      </div>
+      <h3 className="text-sm font-bold text-slate-700">{title}</h3>
+      <p className="text-xs text-slate-400 mt-1">{text}</p>
     </div>
   );
 }
@@ -566,22 +700,27 @@ function Detail({ label, value }) {
   );
 }
 
-function Modal({ open, onClose, title, children }) {
+function Drawer({ open, onClose, title, subtitle, children }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[520px] p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-red-500 cursor-pointer"
-        >
-          <X size={20} />
-        </button>
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/20 backdrop-blur-sm">
+      <div className="h-full w-full max-w-xl bg-white shadow-2xl overflow-y-auto animate-slideIn">
+        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10">
+          <div>
+            <h2 className="text-xl font-extrabold text-slate-800">{title}</h2>
+            <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
+          </div>
 
-        <h2 className="text-xl font-extrabold text-slate-800 mb-5">{title}</h2>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-        {children}
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );
@@ -591,7 +730,7 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center">
         <h2 className="text-xl font-extrabold text-red-600 mb-3">{title}</h2>
 
@@ -622,7 +761,7 @@ function AlertModal({ type, message, onClose }) {
   const isSuccess = type === "success";
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] px-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[9999] px-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-[400px] p-6 text-center">
         <h2
           className={`text-xl font-extrabold mb-3 ${

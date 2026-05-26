@@ -236,14 +236,6 @@ export default function BillingPage() {
 
   return (
     <DashboardLayout title="Billing">
-      {alert && (
-        <AlertModal
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
-
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <SummaryCard
@@ -659,37 +651,6 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
             {loading ? "Deleting..." : "Delete"}
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function AlertModal({ type, message, onClose }) {
-  const ok = type === "success";
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[400px] p-6 text-center">
-        <h2
-          className={`text-xl font-extrabold mb-3 ${
-            ok ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {ok ? "Success" : "Error"}
-        </h2>
-
-        <p className="text-sm text-slate-600 mb-6">{message}</p>
-
-        <button
-          onClick={onClose}
-          className={`px-5 py-2 rounded-xl text-white cursor-pointer ${
-            ok
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-red-600 hover:bg-red-700"
-          }`}
-        >
-          OK
-        </button>
       </div>
     </div>
   );
