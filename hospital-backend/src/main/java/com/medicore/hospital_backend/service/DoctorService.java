@@ -1,6 +1,11 @@
 package com.medicore.hospital_backend.service;
+
 import com.medicore.hospital_backend.model.Doctor;
+import com.medicore.hospital_backend.model.Role;
+import com.medicore.hospital_backend.model.User;
 import com.medicore.hospital_backend.repository.DoctorRepository;
+import com.medicore.hospital_backend.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,19 +14,45 @@ import java.util.List;
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DoctorService (DoctorRepository doctorRepository) {
+    public DoctorService(
+            DoctorRepository doctorRepository,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.doctorRepository = doctorRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    //Get all patients
     public List<Doctor> getAllDoctors() {
         return doctorRepository.findAll();
     }
 
-    //Create Doctor
-    public Doctor createDoctor(Doctor patient) {
-        return doctorRepository.save(patient);
+    public Doctor createDoctor(Doctor doctor) {
+        if (doctor.getEmail() == null || doctor.getEmail().isBlank()) {
+            throw new RuntimeException("Doctor email is required");
+        }
+
+        if (userRepository.findByEmail(doctor.getEmail()).isPresent()) {
+            throw new RuntimeException("A user with this email already exists");
+        }
+
+        Doctor savedDoctor = doctorRepository.save(doctor);
+
+        User user = new User();
+        user.setFullName(savedDoctor.getFirstName() + " " + savedDoctor.getLastName());
+        user.setEmail(savedDoctor.getEmail());
+        user.setPassword(passwordEncoder.encode("12345678"));
+        user.setRole(Role.DOCTOR);
+
+        User savedUser = userRepository.save(user);
+
+        savedDoctor.setUser(savedUser);
+
+        return doctorRepository.save(savedDoctor);
     }
 
     public Doctor getDoctorById(Long id) {
@@ -34,11 +65,9 @@ public class DoctorService {
 
         doctor.setFirstName(doctorDetails.getFirstName());
         doctor.setLastName(doctorDetails.getLastName());
-        doctorDetails.setSpecialization(doctorDetails.getSpecialization());
+        doctor.setSpecialization(doctorDetails.getSpecialization());
         doctor.setPhone(doctorDetails.getPhone());
         doctor.setEmail(doctorDetails.getEmail());
-
-
 
         return doctorRepository.save(doctor);
     }
@@ -47,7 +76,4 @@ public class DoctorService {
         Doctor doctor = getDoctorById(id);
         doctorRepository.delete(doctor);
     }
-
-
-
 }

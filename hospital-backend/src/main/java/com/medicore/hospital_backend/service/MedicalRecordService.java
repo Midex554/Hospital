@@ -1,8 +1,8 @@
 package com.medicore.hospital_backend.service;
+
 import com.medicore.hospital_backend.entity.MedicalRecord;
-import com.medicore.hospital_backend.model.Patient;
-import com.medicore.hospital_backend.repository.MedicalRecordRepository;
-import com.medicore.hospital_backend.repository.PatientRepository;
+import com.medicore.hospital_backend.model.*;
+import com.medicore.hospital_backend.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,51 +12,43 @@ public class MedicalRecordService {
 
     private final MedicalRecordRepository medicalRecordRepository;
     private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
 
-    public MedicalRecordService(MedicalRecordRepository medicalRecordRepository,
-                                PatientRepository patientRepository) {
+    public MedicalRecordService(
+            MedicalRecordRepository medicalRecordRepository,
+            PatientRepository patientRepository,
+            DoctorRepository doctorRepository
+    ) {
         this.medicalRecordRepository = medicalRecordRepository;
         this.patientRepository = patientRepository;
+        this.doctorRepository = doctorRepository;
     }
 
-    //Get all patients
-    public List<MedicalRecord> getAllMedicalRecords() {
-        return medicalRecordRepository.findAll();
-    }
+    public MedicalRecord createRecord(MedicalRecord record) {
 
-    //Create Patient
-    public MedicalRecord createMedicalRecords(MedicalRecord medicalRecord) {
-        Long patientId = medicalRecord.getPatient().getId();
+        Patient patient = patientRepository.findById(
+                record.getPatient().getId()
+        ).orElseThrow(() -> new RuntimeException("Patient not found"));
 
-        Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient Record Not Found"));
+        Doctor doctor = doctorRepository.findById(
+                record.getDoctor().getId()
+        ).orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        medicalRecord.setPatient(patient);
-
-        return medicalRecordRepository.save(medicalRecord);
-    }
-
-    public MedicalRecord getMedicalRecordById(Long id) {
-        return medicalRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Medical Record not found"));
-    }
-
-    public MedicalRecord updateMedicalRecord(Long id, MedicalRecord details) {
-        MedicalRecord record = getMedicalRecordById(id);
-
-        record.setDiagnosis(details.getDiagnosis());
-        record.setTreatment(details.getTreatment());
-        record.setPrescription(details.getPrescription());
-        record.setNotes(details.getNotes());
+        record.setPatient(patient);
+        record.setDoctor(doctor);
 
         return medicalRecordRepository.save(record);
     }
 
-    public void deleteMedicalRecord(Long id) {
-        MedicalRecord record = getMedicalRecordById(id);
-        medicalRecordRepository.delete(record);
+    public List<MedicalRecord> getAllRecords() {
+        return medicalRecordRepository.findAll();
     }
 
+    public List<MedicalRecord> getRecordsByPatient(Long patientId) {
+        return medicalRecordRepository.findByPatientId(patientId);
+    }
 
-
+    public List<MedicalRecord> getRecordsByDoctor(Long doctorId) {
+        return medicalRecordRepository.findByDoctorId(doctorId);
+    }
 }

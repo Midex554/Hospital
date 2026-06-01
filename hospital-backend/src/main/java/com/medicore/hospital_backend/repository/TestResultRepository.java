@@ -1,4 +1,10 @@
 package com.medicore.hospital_backend.repository;
 
-public class TestResultRepository {
+import com.medicore.hospital_backend.entity.TestResult;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface TestResultRepository extends JpaRepository<TestResult, Long> {
+    List<TestResult> findByPatientId(Long patientId);
+    List<TestResult> findByDoctorId(Long doctorId);
 }

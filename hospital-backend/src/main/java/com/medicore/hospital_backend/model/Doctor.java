@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 
+
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +21,10 @@ public class Doctor {
     private String specialization;
     private String phone;
     private String email;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 }

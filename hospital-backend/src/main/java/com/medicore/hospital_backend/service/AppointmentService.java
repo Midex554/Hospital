@@ -29,6 +29,7 @@ public class AppointmentService {
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
+
     public List<Appointment> getAppointmentsByPatient(Long patientId) {
         return appointmentRepository.findByPatientId(patientId);
     }
@@ -77,6 +78,12 @@ public class AppointmentService {
         appointment.setStatus(appointmentDetails.getStatus());
         appointment.setNotes(appointmentDetails.getNotes());
 
+        return appointmentRepository.save(appointment);
+    }
+
+    public Appointment updateAppointmentStatus(Long id, String status) {
+        Appointment appointment = getAppointmentById(id);
+        appointment.setStatus(status);
         return appointmentRepository.save(appointment);
     }
 

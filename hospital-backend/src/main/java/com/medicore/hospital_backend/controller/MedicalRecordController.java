@@ -1,46 +1,43 @@
 package com.medicore.hospital_backend.controller;
+
 import com.medicore.hospital_backend.entity.MedicalRecord;
 import com.medicore.hospital_backend.service.MedicalRecordService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/medical-records")
 @CrossOrigin("*")
-
 public class MedicalRecordController {
 
     private final MedicalRecordService medicalRecordService;
 
-    public MedicalRecordController(MedicalRecordService medicalRecordService){
+    public MedicalRecordController(MedicalRecordService medicalRecordService) {
         this.medicalRecordService = medicalRecordService;
     }
 
-    // Get all patient
-    @GetMapping
-    public List<MedicalRecord> getAllMedicalRecords() {
-        return medicalRecordService.getAllMedicalRecords();
-    }
-
-    //Post create patient
     @PostMapping
-    public MedicalRecord createMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
-        return medicalRecordService.createMedicalRecords(medicalRecord);
+    public MedicalRecord createRecord(@RequestBody MedicalRecord record) {
+        return medicalRecordService.createRecord(record);
     }
 
-    @GetMapping("/{id}")
-    public MedicalRecord getMedicalRecordById(@PathVariable Long id) {
-        return medicalRecordService.getMedicalRecordById(id);
+    @GetMapping
+    public List<MedicalRecord> getAllRecords() {
+        return medicalRecordService.getAllRecords();
     }
 
-    @PutMapping("/{id}")
-    public MedicalRecord updateMedicalRecord(@PathVariable Long id, @RequestBody MedicalRecord medicalRecord) {
-        return medicalRecordService.updateMedicalRecord(id, medicalRecord);
+    @GetMapping("/patient/{patientId}")
+    public List<MedicalRecord> getRecordsByPatient(
+            @PathVariable Long patientId
+    ) {
+        return medicalRecordService.getRecordsByPatient(patientId);
     }
 
-    @DeleteMapping("/{id}")
-    public String deletePatient(@PathVariable Long id) {
-        medicalRecordService.deleteMedicalRecord(id);
-        return "Patient data deleted successfully";
+    @GetMapping("/doctor/{doctorId}")
+    public List<MedicalRecord> getRecordsByDoctor(
+            @PathVariable Long doctorId
+    ) {
+        return medicalRecordService.getRecordsByDoctor(doctorId);
     }
 }
