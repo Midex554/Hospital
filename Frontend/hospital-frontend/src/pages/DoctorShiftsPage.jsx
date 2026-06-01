@@ -35,7 +35,7 @@ export default function DoctorShiftsPage() {
   const [saving, setSaving] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [alert, setAlert] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -43,6 +43,11 @@ export default function DoctorShiftsPage() {
 
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const fullName = (doctor) =>
     `${doctor?.firstName || ""} ${doctor?.lastName || ""}`.trim();
@@ -59,10 +64,10 @@ export default function DoctorShiftsPage() {
       setShifts(Array.isArray(sRes.data) ? sRes.data : []);
       setDoctors(Array.isArray(dRes.data) ? dRes.data : []);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Failed to load shifts.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to load shifts.",
+      );
     } finally {
       setLoading(false);
     }
@@ -127,7 +132,7 @@ export default function DoctorShiftsPage() {
     const errorMessage = validateForm();
 
     if (errorMessage) {
-      setAlert({ type: "error", message: errorMessage });
+      showToast("error", errorMessage);
       return;
     }
 
@@ -139,14 +144,14 @@ export default function DoctorShiftsPage() {
       });
 
       setShifts((prev) => [...prev, res.data]);
-      setAlert({ type: "success", message: "Doctor shift created." });
+      showToast("success", "Doctor shift created.");
       setAddOpen(false);
       setForm(EMPTY_FORM);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Failed to create shift.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to create shift.",
+      );
     } finally {
       setSaving(false);
     }
@@ -172,7 +177,7 @@ export default function DoctorShiftsPage() {
     const errorMessage = validateForm();
 
     if (errorMessage) {
-      setAlert({ type: "error", message: errorMessage });
+      showToast("error", errorMessage);
       return;
     }
 
@@ -187,15 +192,15 @@ export default function DoctorShiftsPage() {
         prev.map((shift) => (shift.id === selected.id ? res.data : shift)),
       );
 
-      setAlert({ type: "success", message: "Doctor shift updated." });
+      showToast("success", "Doctor shift updated.");
       setEditOpen(false);
       setSelected(null);
       setForm(EMPTY_FORM);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Failed to update shift.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to update shift.",
+      );
     } finally {
       setSaving(false);
     }
@@ -217,14 +222,14 @@ export default function DoctorShiftsPage() {
       });
 
       setShifts((prev) => prev.filter((shift) => shift.id !== selected.id));
-      setAlert({ type: "success", message: "Doctor shift deleted." });
+      showToast("success", "Doctor shift deleted.");
       setDeleteOpen(false);
       setSelected(null);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Failed to delete shift.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to delete shift.",
+      );
     } finally {
       setSaving(false);
     }
@@ -232,13 +237,7 @@ export default function DoctorShiftsPage() {
 
   return (
     <DashboardLayout title="Doctor Shifts">
-      {alert && (
-        <AlertModal
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
+      {toast && <Toast type={toast.type} message={toast.message} />}
 
       <div className="max-w-[1400px] mx-auto space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -249,7 +248,6 @@ export default function DoctorShiftsPage() {
             sub="All assigned shifts"
             color="blue"
           />
-
           <StatCard
             icon={Activity}
             label="On Duty"
@@ -257,7 +255,6 @@ export default function DoctorShiftsPage() {
             sub="Available doctors"
             color="green"
           />
-
           <StatCard
             icon={Clock}
             label="On Break"
@@ -265,7 +262,6 @@ export default function DoctorShiftsPage() {
             sub="Temporarily unavailable"
             color="yellow"
           />
-
           <StatCard
             icon={Stethoscope}
             label="Off Duty"
@@ -275,9 +271,9 @@ export default function DoctorShiftsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-800">
+            <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
               Doctor Shifts
             </h2>
             <p className="text-xs text-slate-400">
@@ -288,7 +284,7 @@ export default function DoctorShiftsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={fetchAll}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 cursor-pointer"
+              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 cursor-pointer"
             >
               <RefreshCw size={16} />
             </button>
@@ -316,15 +312,15 @@ export default function DoctorShiftsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by doctor, specialization, date, time, status..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm"
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm"
           />
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[1000px]">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
+                <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                   {[
                     "#",
                     "Doctor",
@@ -337,7 +333,7 @@ export default function DoctorShiftsPage() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap"
+                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest whitespace-nowrap"
                     >
                       {h}
                     </th>
@@ -348,7 +344,10 @@ export default function DoctorShiftsPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="8" className="p-10 text-center text-slate-500">
+                    <td
+                      colSpan="8"
+                      className="p-10 text-center text-slate-500 dark:text-slate-300"
+                    >
                       Loading shifts...
                     </td>
                   </tr>
@@ -362,29 +361,29 @@ export default function DoctorShiftsPage() {
                   filtered.map((shift, index) => (
                     <tr
                       key={shift.id}
-                      className="border-b border-slate-50 hover:bg-blue-50/40 hover:scale-[1.002] transition-all duration-200"
+                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition-all duration-200"
                     >
-                      <td className="px-4 py-3 text-slate-400 font-mono text-xs">
+                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 font-mono text-xs">
                         {index + 1}
                       </td>
 
-                      <td className="px-4 py-3 font-semibold text-slate-800">
+                      <td className="px-4 py-3 font-semibold text-slate-800 dark:text-white">
                         Dr. {fullName(shift.doctor) || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {shift.doctor?.specialization || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {shift.shiftDate || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {shift.startTime || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {shift.endTime || "—"}
                       </td>
 
@@ -396,14 +395,14 @@ export default function DoctorShiftsPage() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openEdit(shift)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-green-100 text-slate-600 hover:text-green-600 cursor-pointer"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
                             onClick={() => openDelete(shift)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-600 hover:text-red-600 cursor-pointer"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -417,7 +416,7 @@ export default function DoctorShiftsPage() {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400 flex justify-between">
+            <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400 flex justify-between">
               <span>
                 Showing {filtered.length} of {shifts.length} doctor shifts
               </span>
@@ -473,6 +472,19 @@ export default function DoctorShiftsPage() {
   );
 }
 
+function Toast({ type, message }) {
+  const styles =
+    type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white";
+
+  return (
+    <div
+      className={`fixed top-6 right-6 z-[9999] px-5 py-3 rounded-xl shadow-lg text-sm font-semibold ${styles}`}
+    >
+      {message}
+    </div>
+  );
+}
+
 function ShiftForm({
   form,
   doctors,
@@ -491,7 +503,6 @@ function ShiftForm({
         onChange={onChange}
       >
         <option value="">Select doctor</option>
-
         {doctors.map((doctor) => (
           <option key={doctor.id} value={doctor.id}>
             Dr. {fullName(doctor)}
@@ -507,7 +518,6 @@ function ShiftForm({
         value={form.shiftDate}
         onChange={onChange}
       />
-
       <FormInput
         label="Start Time"
         name="startTime"
@@ -515,7 +525,6 @@ function ShiftForm({
         value={form.startTime}
         onChange={onChange}
       />
-
       <FormInput
         label="End Time"
         name="endTime"
@@ -559,14 +568,11 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
 
   return (
     <div
-      className={`bg-gradient-to-br ${
-        colors[color] || colors.blue
-      } rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
+      className={`bg-gradient-to-br ${colors[color] || colors.blue} rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
     >
       <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
         <Icon size={20} />
       </div>
-
       <p className="text-sm text-white/80">{label}</p>
       <h3 className="text-2xl font-extrabold mt-1">{value}</h3>
       <p className="text-xs text-white/70 mt-1">{sub}</p>
@@ -577,10 +583,10 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
 function StatusBadge({ status }) {
   const cls =
     status === "ON_DUTY"
-      ? "bg-green-100 text-green-700 border-green-200"
+      ? "bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800"
       : status === "BREAK"
-        ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-        : "bg-red-100 text-red-700 border-red-200";
+        ? "bg-yellow-100 dark:bg-yellow-950/40 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800"
+        : "bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800";
 
   return (
     <span
@@ -594,14 +600,12 @@ function StatusBadge({ status }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center text-center">
-      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+      <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 flex items-center justify-center mb-3">
         <Activity size={22} />
       </div>
-
-      <h3 className="text-sm font-bold text-slate-700">
+      <h3 className="text-sm font-bold text-slate-700 dark:text-white">
         No doctor shifts found
       </h3>
-
       <p className="text-xs text-slate-400 mt-1">
         Assign doctors to shifts so the system can detect who is on duty.
       </p>
@@ -612,7 +616,7 @@ function EmptyState() {
 function FormInput({ label, name, value, onChange, type = "text" }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
         {label}
       </label>
 
@@ -621,7 +625,7 @@ function FormInput({ label, name, value, onChange, type = "text" }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       />
     </div>
   );
@@ -630,7 +634,7 @@ function FormInput({ label, name, value, onChange, type = "text" }) {
 function FormSelect({ label, name, value, onChange, children }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
         {label}
       </label>
 
@@ -638,7 +642,7 @@ function FormSelect({ label, name, value, onChange, children }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 bg-white"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       >
         {children}
       </select>
@@ -650,17 +654,19 @@ function Drawer({ open, onClose, title, subtitle, children }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/20 backdrop-blur-sm">
-      <div className="h-full w-full max-w-xl bg-white shadow-2xl overflow-y-auto animate-slideIn">
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
+      <div className="h-full w-full max-w-xl bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-2xl overflow-y-auto animate-slideIn">
+        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800">{title}</h2>
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+              {title}
+            </h2>
             <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
           </div>
 
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
+            className="w-9 h-9 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
           >
             <X size={18} />
           </button>
@@ -676,17 +682,21 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center">
-        <h2 className="text-xl font-extrabold text-red-600 mb-3">{title}</h2>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border border-slate-100 dark:border-slate-700">
+        <h2 className="text-xl font-extrabold text-red-600 dark:text-red-400 mb-3">
+          {title}
+        </h2>
 
-        <p className="text-sm text-slate-600 mb-6">{message}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+          {message}
+        </p>
 
         <div className="flex justify-center gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300"
+            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
           >
             Cancel
           </button>
@@ -700,38 +710,6 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
             {loading ? "Deleting..." : "Delete"}
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function AlertModal({ type, message, onClose }) {
-  const ok = type === "success";
-
-  return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[9999] px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[400px] p-6 text-center">
-        <h2
-          className={`text-xl font-extrabold mb-3 ${
-            ok ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {ok ? "Success" : "Error"}
-        </h2>
-
-        <p className="text-sm text-slate-600 mb-6">{message}</p>
-
-        <button
-          type="button"
-          onClick={onClose}
-          className={`px-5 py-2 rounded-xl text-white ${
-            ok
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-red-600 hover:bg-red-700"
-          }`}
-        >
-          OK
-        </button>
       </div>
     </div>
   );

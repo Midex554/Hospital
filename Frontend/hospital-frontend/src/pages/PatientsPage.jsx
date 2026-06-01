@@ -44,6 +44,13 @@ function PatientsPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
+  const [toast, setToast] = useState(null);
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const fullName = (patient) =>
     `${patient?.firstName || ""} ${patient?.lastName || ""}`.trim();
 
@@ -114,15 +121,12 @@ function PatientsPage() {
       });
 
       setPatients((prev) => [...prev, res.data]);
-      setAlert({ type: "success", message: "Patient added successfully." });
+      showToast("success", "Patient added successfully.");
 
       setAddOpen(false);
       setForm(EMPTY_FORM);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Failed to add patient.",
-      });
+      showToast("error", "Failed to add patient.");
     } finally {
       setSaving(false);
     }
@@ -158,15 +162,10 @@ function PatientsPage() {
         prev.map((p) => (p.id === selected.id ? res.data : p)),
       );
 
-      setAlert({ type: "success", message: "Patient updated successfully." });
-
       setEditOpen(false);
       setSelected(null);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Failed to update patient.",
-      });
+      showToast("error", "Failed to update patient.");
     } finally {
       setSaving(false);
     }
@@ -189,16 +188,12 @@ function PatientsPage() {
 
       setPatients((prev) => prev.filter((p) => p.id !== selected.id));
 
-      setAlert({ type: "success", message: "Patient deleted successfully." });
+      showToast("success", "Patient deleted successfully.");
 
       setDelOpen(false);
       setSelected(null);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message:
-          error.response?.data?.message || "Patient could not be deleted.",
-      });
+      showToast("error", "Patient could not be deleted.");
     } finally {
       setSaving(false);
     }
@@ -211,13 +206,7 @@ function PatientsPage() {
 
   return (
     <DashboardLayout title="Patients">
-      {alert && (
-        <AlertModal
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
+      {toast && <Toast type={toast.type} message={toast.message} />}
 
       <div className="max-w-[1400px] mx-auto space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -254,10 +243,12 @@ function PatientsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-800">Patients</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
+              Patients
+            </h2>
+            <p className="text-xs text-slate-400 dark:text-slate-400">
               Manage patient biodata and hospital records
             </p>
           </div>
@@ -265,7 +256,7 @@ function PatientsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={fetchPatients}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition cursor-pointer"
+              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 transition cursor-pointer"
             >
               <RefreshCw size={16} />
             </button>
@@ -275,7 +266,7 @@ function PatientsPage() {
                 setForm(EMPTY_FORM);
                 setAddOpen(true);
               }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200 dark:shadow-none"
             >
               <Plus size={16} />
               Add Patient
@@ -293,15 +284,15 @@ function PatientsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, email, phone, blood group..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition"
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition placeholder:text-slate-400"
           />
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[900px]">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
+                <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                   {[
                     "#",
                     "Patient",
@@ -313,7 +304,7 @@ function PatientsPage() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap"
+                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest whitespace-nowrap"
                     >
                       {h}
                     </th>
@@ -324,7 +315,10 @@ function PatientsPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="p-10 text-center text-slate-500">
+                    <td
+                      colSpan="7"
+                      className="p-10 text-center text-slate-500 dark:text-slate-300"
+                    >
                       Loading patients...
                     </td>
                   </tr>
@@ -341,9 +335,9 @@ function PatientsPage() {
                   filtered.map((patient, index) => (
                     <tr
                       key={patient.id}
-                      className="border-b border-slate-50 hover:bg-blue-50/40 hover:scale-[1.002] transition-all duration-200 group"
+                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition-all duration-200 group"
                     >
-                      <td className="px-4 py-3 text-slate-400 font-mono text-xs">
+                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 font-mono text-xs">
                         {index + 1}
                       </td>
 
@@ -354,10 +348,10 @@ function PatientsPage() {
                           </div>
 
                           <div>
-                            <p className="font-semibold text-slate-800">
+                            <p className="font-semibold text-slate-800 dark:text-white">
                               {fullName(patient) || "—"}
                             </p>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-[11px] text-slate-400 dark:text-slate-400">
                               {patient.email || "—"}
                             </p>
                           </div>
@@ -368,21 +362,21 @@ function PatientsPage() {
                         <GenderBadge gender={patient.gender} />
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {patient.phone || "—"}
                       </td>
 
                       <td className="px-4 py-3">
                         {patient.bloodGroup ? (
-                          <span className="bg-red-50 text-red-600 border border-red-200 text-xs font-bold px-2.5 py-1 rounded-lg">
+                          <span className="bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800 text-xs font-bold px-2.5 py-1 rounded-lg">
                             {patient.bloodGroup}
                           </span>
                         ) : (
-                          "—"
+                          <span className="text-slate-400">—</span>
                         )}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[280px] truncate">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[280px] truncate">
                         {patient.address || "—"}
                       </td>
 
@@ -390,21 +384,21 @@ function PatientsPage() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openView(patient)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-600 cursor-pointer transition"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-950/40 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition"
                           >
                             <User size={15} />
                           </button>
 
                           <button
                             onClick={() => openEdit(patient)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-green-100 text-slate-600 hover:text-green-600 cursor-pointer transition"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer transition"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
                             onClick={() => openDelete(patient)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-600 hover:text-red-600 cursor-pointer transition"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer transition"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -418,7 +412,7 @@ function PatientsPage() {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400 flex justify-between">
+            <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400 dark:text-slate-400 flex justify-between">
               <span>
                 Showing {filtered.length} of {patients.length} patients
               </span>
@@ -466,16 +460,16 @@ function PatientsPage() {
       >
         {selected && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-700">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white text-2xl font-extrabold">
                 {(selected.firstName || "?").charAt(0)}
               </div>
 
               <div>
-                <p className="text-lg font-extrabold text-slate-800">
+                <p className="text-lg font-extrabold text-slate-800 dark:text-white">
                   {fullName(selected)}
                 </p>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-slate-400 dark:text-slate-400">
                   {selected.email || "—"}
                 </p>
               </div>
@@ -615,7 +609,7 @@ function GenderBadge({ gender }) {
 
   if (value === "male") {
     return (
-      <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg text-xs font-semibold">
+      <span className="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 px-2.5 py-1 rounded-lg text-xs font-semibold">
         Male
       </span>
     );
@@ -623,23 +617,25 @@ function GenderBadge({ gender }) {
 
   if (value === "female") {
     return (
-      <span className="bg-pink-50 text-pink-600 px-2.5 py-1 rounded-lg text-xs font-semibold">
+      <span className="bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-300 px-2.5 py-1 rounded-lg text-xs font-semibold">
         Female
       </span>
     );
   }
 
-  return <span className="text-slate-400">—</span>;
+  return <span className="text-slate-400 dark:text-slate-500">—</span>;
 }
 
 function EmptyState({ title, text }) {
   return (
     <div className="flex flex-col items-center justify-center text-center">
-      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+      <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 flex items-center justify-center mb-3">
         <User size={22} />
       </div>
-      <h3 className="text-sm font-bold text-slate-700">{title}</h3>
-      <p className="text-xs text-slate-400 mt-1">{text}</p>
+      <h3 className="text-sm font-bold text-slate-700 dark:text-white">
+        {title}
+      </h3>
+      <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">{text}</p>
     </div>
   );
 }
@@ -654,7 +650,7 @@ function FormInput({
 }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
         {label}
       </label>
 
@@ -664,7 +660,7 @@ function FormInput({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 placeholder:text-slate-400"
       />
     </div>
   );
@@ -673,7 +669,7 @@ function FormInput({
 function FormSelect({ label, name, value, onChange, children }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
         {label}
       </label>
 
@@ -681,7 +677,7 @@ function FormSelect({ label, name, value, onChange, children }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       >
         {children}
       </select>
@@ -691,11 +687,13 @@ function FormSelect({ label, name, value, onChange, children }) {
 
 function Detail({ label, value }) {
   return (
-    <div className="bg-slate-50 rounded-xl px-3 py-3">
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+    <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-3">
+      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </p>
-      <p className="text-slate-700 font-medium mt-1">{value || "—"}</p>
+      <p className="text-slate-700 dark:text-white font-medium mt-1">
+        {value || "—"}
+      </p>
     </div>
   );
 }
@@ -704,17 +702,21 @@ function Drawer({ open, onClose, title, subtitle, children }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/20 backdrop-blur-sm">
-      <div className="h-full w-full max-w-xl bg-white shadow-2xl overflow-y-auto animate-slideIn">
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
+      <div className="h-full w-full max-w-xl bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto animate-slideIn border-l border-slate-200 dark:border-slate-700">
+        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800">{title}</h2>
-            <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+              {title}
+            </h2>
+            <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
+              {subtitle}
+            </p>
           </div>
 
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
+            className="w-9 h-9 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
           >
             <X size={18} />
           </button>
@@ -730,16 +732,20 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center">
-        <h2 className="text-xl font-extrabold text-red-600 mb-3">{title}</h2>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border border-slate-100 dark:border-slate-700">
+        <h2 className="text-xl font-extrabold text-red-600 dark:text-red-400 mb-3">
+          {title}
+        </h2>
 
-        <p className="text-sm text-slate-600 mb-6">{message}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+          {message}
+        </p>
 
         <div className="flex justify-center gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 cursor-pointer transition"
+            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer transition"
           >
             Cancel
           </button>
@@ -757,33 +763,15 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
   );
 }
 
-function AlertModal({ type, message, onClose }) {
-  const isSuccess = type === "success";
+function Toast({ type, message }) {
+  const styles =
+    type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white";
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[9999] px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[400px] p-6 text-center">
-        <h2
-          className={`text-xl font-extrabold mb-3 ${
-            isSuccess ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {isSuccess ? "Success" : "Error"}
-        </h2>
-
-        <p className="text-sm text-slate-600 mb-6">{message}</p>
-
-        <button
-          onClick={onClose}
-          className={`px-5 py-2 rounded-xl text-white cursor-pointer transition ${
-            isSuccess
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-red-600 hover:bg-red-700"
-          }`}
-        >
-          OK
-        </button>
-      </div>
+    <div
+      className={`fixed top-6 right-6 z-[9999] px-5 py-3 rounded-xl shadow-lg text-sm font-semibold ${styles}`}
+    >
+      {message}
     </div>
   );
 }

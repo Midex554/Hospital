@@ -88,7 +88,7 @@ export default function PatientDashboard() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-extrabold text-slate-800">
@@ -109,7 +109,7 @@ export default function PatientDashboard() {
             />
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-extrabold text-slate-800">
@@ -159,7 +159,7 @@ export default function PatientDashboard() {
             />
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-extrabold text-slate-800">

@@ -293,7 +293,7 @@ export default function AppointmentsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
           <div>
             <h2 className="text-lg font-extrabold text-slate-800">
               Appointments
@@ -335,14 +335,14 @@ export default function AppointmentsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by patient, doctor, date, status..."
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition"
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-sm outline-none"
             />
           </div>
 
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition"
+            className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
           >
             <option value="all">All Status</option>
             {STATUSES.map((s) => (
@@ -353,11 +353,11 @@ export default function AppointmentsPage() {
           </select>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[1000px]">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
+                <tr className="bg-slate-50 border-b border-slate-100 dark:bg-slate-800 dark:border-slate-600">
                   {[
                     "#",
                     "Patient",

@@ -1,96 +1,36 @@
-/* ─────────────────────────────────────────────
-   MediCore HMS — Global Styles (index.css)
-   ───────────────────────────────────────────── */
-
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Important for Tailwind v4 dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
 
-@layer base {
-  html {
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  * {
-    box-sizing: border-box;
-  }
+html {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer utilities {
-  .scrollbar-none {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Thin scrollbar for tables */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: #e2e8f0 transparent;
-  }
-  .scrollbar-thin::-webkit-scrollbar {
-    height: 4px;
-    width: 4px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 999px;
-  }
+* {
+  box-sizing: border-box;
 }
 
-/* Modal entrance animation */
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.94) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+body {
+  background: #f5f8ff;
 }
 
-.animate-modal-in {
-  animation: modal-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+html.dark,
+html.dark body,
+html.dark #root {
+  background: #020617 !important;
+  color: #f8fafc !important;
 }
 
-/* Page fade-in */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.animate-fade-up {
-  animation: fade-up 0.3s ease both;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-.animate-slideIn {
-  animation: slideIn 0.3s ease;
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes slideIn {

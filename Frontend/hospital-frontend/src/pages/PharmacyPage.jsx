@@ -1,36 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
+import { Plus, Search, Edit2, Trash2, Pill, RefreshCw, X } from "lucide-react";
 import api from "../api/api";
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  CreditCard,
-  RefreshCw,
-  X,
-} from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
 
-const authHeader = () => ({
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
-
 const EMPTY_FORM = {
-  patientId: "",
-  billName: "",
-  amount: "",
-  status: "Unpaid",
+  medicineName: "",
+  category: "",
+  quantity: "",
+  price: "",
+  status: "Available",
 };
 
-const STATUSES = ["Unpaid", "Pending", "Paid"];
+const STATUSES = ["Available", "Low Stock", "Out of Stock"];
 
-export default function BillingPage() {
-  const [bills, setBills] = useState([]);
-  const [patients, setPatients] = useState([]);
+export default function PharmacyPage() {
+  const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [toast, setToast] = useState(null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -39,57 +26,67 @@ export default function BillingPage() {
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const authHeader = () => ({
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  });
 
   const showToast = (type, message) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 3000);
   };
 
-  const fullName = (person) =>
-    `${person?.firstName || ""} ${person?.lastName || ""}`.trim();
-
-  const fetchAll = async () => {
+  const fetchMedicines = async () => {
     setLoading(true);
 
     try {
-      const [bRes, pRes] = await Promise.all([
-        api.get("/bills", { headers: authHeader() }),
-        api.get("/patients", { headers: authHeader() }),
-      ]);
+      const res = await api.get("/medicines", {
+        headers: authHeader(),
+      });
 
-      setBills(Array.isArray(bRes.data) ? bRes.data : []);
-      setPatients(Array.isArray(pRes.data) ? pRes.data : []);
+      setMedicines(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
-      showToast(
-        "error",
-        error.response?.data?.message || "Failed to load billing records.",
-      );
+      console.error("Medicine fetch error:", error.response?.data || error);
+      showToast("error", "Failed to load medicines");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAll();
+    fetchMedicines();
   }, []);
 
+  const generateStatus = (quantity) => {
+    const qty = Number(quantity);
+
+    if (qty <= 0) return "Out of Stock";
+    if (qty <= 10) return "Low Stock";
+    return "Available";
+  };
+
   const summary = useMemo(() => {
-    const total = bills.reduce((s, b) => s + Number(b.amount || 0), 0);
-
-    const paid = bills
-      .filter((b) => b.status?.toLowerCase() === "paid")
-      .reduce((s, b) => s + Number(b.amount || 0), 0);
-
     return {
-      total,
-      paid,
-      outstanding: total - paid,
+      total: medicines.length,
+      available: medicines.filter(
+        (m) => generateStatus(m.quantity) === "Available",
+      ).length,
+      lowStock: medicines.filter(
+        (m) => generateStatus(m.quantity) === "Low Stock",
+      ).length,
     };
-  }, [bills]);
+  }, [medicines]);
 
   const filtered = useMemo(() => {
-    return bills.filter((b) => {
-      const text = [fullName(b.patient), b.billName, b.amount, b.status]
+    return medicines.filter((m) => {
+      const text = [
+        m.medicineName,
+        m.category,
+        m.quantity,
+        m.price,
+        generateStatus(m.quantity),
+      ]
         .join(" ")
         .toLowerCase();
 
@@ -97,11 +94,11 @@ export default function BillingPage() {
 
       const matchStatus =
         filterStatus === "all" ||
-        b.status?.toLowerCase() === filterStatus.toLowerCase();
+        generateStatus(m.quantity).toLowerCase() === filterStatus.toLowerCase();
 
       return matchSearch && matchStatus;
     });
-  }, [bills, search, filterStatus]);
+  }, [medicines, search, filterStatus]);
 
   const handleChange = (e) => {
     setForm((f) => ({
@@ -111,18 +108,23 @@ export default function BillingPage() {
   };
 
   const validateForm = () => {
-    if (!form.patientId) {
-      showToast("error", "Please select a patient.");
+    if (!form.medicineName.trim()) {
+      showToast("error", "Medicine name is required");
       return false;
     }
 
-    if (!form.billName.trim()) {
-      showToast("error", "Bill name is required.");
+    if (!form.category.trim()) {
+      showToast("error", "Category is required");
       return false;
     }
 
-    if (form.amount === "" || Number(form.amount) <= 0) {
-      showToast("error", "Enter a valid amount.");
+    if (form.quantity === "" || Number(form.quantity) < 0) {
+      showToast("error", "Enter a valid quantity");
+      return false;
+    }
+
+    if (form.price === "" || Number(form.price) < 0) {
+      showToast("error", "Enter a valid price");
       return false;
     }
 
@@ -130,12 +132,11 @@ export default function BillingPage() {
   };
 
   const toPayload = () => ({
-    billName: form.billName.trim(),
-    amount: Number(form.amount),
-    status: form.status,
-    patient: {
-      id: Number(form.patientId),
-    },
+    medicineName: form.medicineName.trim(),
+    category: form.category.trim(),
+    quantity: Number(form.quantity),
+    price: Number(form.price),
+    status: generateStatus(form.quantity),
   });
 
   const handleAdd = async () => {
@@ -144,33 +145,31 @@ export default function BillingPage() {
     setSaving(true);
 
     try {
-      const res = await api.post("/bills", toPayload(), {
+      const res = await api.post("/medicines", toPayload(), {
         headers: authHeader(),
       });
 
-      setBills((prev) => [...prev, res.data]);
-      showToast("success", "Bill created successfully.");
-
+      setMedicines((prev) => [...prev, res.data]);
       setAddOpen(false);
       setForm(EMPTY_FORM);
+      showToast("success", "Medicine added successfully");
     } catch (error) {
-      showToast(
-        "error",
-        error.response?.data?.message || "Failed to create bill.",
-      );
+      console.error("Add medicine error:", error.response?.data || error);
+      showToast("error", "Failed to add medicine");
     } finally {
       setSaving(false);
     }
   };
 
-  const openEdit = (bill) => {
-    setSelected(bill);
+  const openEdit = (medicine) => {
+    setSelected(medicine);
 
     setForm({
-      patientId: bill.patient?.id || "",
-      billName: bill.billName || "",
-      amount: bill.amount || "",
-      status: bill.status || "Unpaid",
+      medicineName: medicine.medicineName || "",
+      category: medicine.category || "",
+      quantity: medicine.quantity ?? "",
+      price: medicine.price ?? "",
+      status: medicine.status || "Available",
     });
 
     setEditOpen(true);
@@ -183,30 +182,28 @@ export default function BillingPage() {
     setSaving(true);
 
     try {
-      const res = await api.put(`/bills/${selected.id}`, toPayload(), {
+      const res = await api.put(`/medicines/${selected.id}`, toPayload(), {
         headers: authHeader(),
       });
 
-      setBills((prev) =>
-        prev.map((b) => (b.id === selected.id ? res.data : b)),
+      setMedicines((prev) =>
+        prev.map((m) => (m.id === selected.id ? res.data : m)),
       );
 
-      showToast("success", "Bill updated successfully.");
       setEditOpen(false);
       setSelected(null);
       setForm(EMPTY_FORM);
+      showToast("success", "Medicine updated successfully");
     } catch (error) {
-      showToast(
-        "error",
-        error.response?.data?.message || "Failed to update bill.",
-      );
+      console.error("Edit medicine error:", error.response?.data || error);
+      showToast("error", "Failed to update medicine");
     } finally {
       setSaving(false);
     }
   };
 
-  const openDelete = (bill) => {
-    setSelected(bill);
+  const openDelete = (medicine) => {
+    setSelected(medicine);
     setDelOpen(true);
   };
 
@@ -216,87 +213,47 @@ export default function BillingPage() {
     setSaving(true);
 
     try {
-      await api.delete(`/bills/${selected.id}`, {
+      await api.delete(`/medicines/${selected.id}`, {
         headers: authHeader(),
       });
 
-      setBills((prev) => prev.filter((b) => b.id !== selected.id));
-
-      showToast("success", "Bill deleted successfully.");
+      setMedicines((prev) => prev.filter((m) => m.id !== selected.id));
       setDelOpen(false);
       setSelected(null);
+      showToast("success", "Medicine deleted successfully");
     } catch (error) {
-      showToast(
-        "error",
-        error.response?.data?.message || "Failed to delete bill.",
-      );
+      console.error("Delete medicine error:", error.response?.data || error);
+      showToast("error", "Failed to delete medicine");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleMarkAsPaid = async (bill) => {
-    try {
-      const payload = {
-        billName: bill.billName,
-        amount: Number(bill.amount),
-        status: "Paid",
-        patient: {
-          id: Number(bill.patient?.id),
-        },
-      };
-
-      const res = await api.put(`/bills/${bill.id}`, payload, {
-        headers: authHeader(),
-      });
-
-      setBills((prev) => prev.map((b) => (b.id === bill.id ? res.data : b)));
-
-      showToast("success", "Bill marked as paid.");
-    } catch (error) {
-      showToast(
-        "error",
-        error.response?.data?.message || "Failed to update bill.",
-      );
-    }
-  };
-
   return (
-    <DashboardLayout title="Billing">
+    <DashboardLayout title="Pharmacy">
       {toast && <Toast type={toast.type} message={toast.message} />}
 
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <SummaryCard
-            label="Total Bills"
-            value={`₦${summary.total.toLocaleString()}`}
-          />
-
-          <SummaryCard
-            label="Paid"
-            value={`₦${summary.paid.toLocaleString()}`}
-          />
-
-          <SummaryCard
-            label="Outstanding"
-            value={`₦${summary.outstanding.toLocaleString()}`}
-          />
+          <SummaryCard label="Total Medicines" value={summary.total} />
+          <SummaryCard label="Available" value={summary.available} />
+          <SummaryCard label="Low Stock" value={summary.lowStock} />
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
           <div>
             <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
-              Billing Records
+              Pharmacy Inventory
             </h2>
 
-            <p className="text-xs text-slate-400 dark:text-slate-400">
-              {bills.length} billing records
+            <p className="text-xs text-slate-400">
+              {medicines.length} medicines registered
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              onClick={fetchAll}
+              onClick={fetchMedicines}
               className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 cursor-pointer"
             >
               <RefreshCw size={16} />
@@ -310,7 +267,7 @@ export default function BillingPage() {
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer"
             >
               <Plus size={16} />
-              Add Bill
+              Add Medicine
             </button>
           </div>
         </div>
@@ -325,7 +282,7 @@ export default function BillingPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search bills..."
+              placeholder="Search medicines..."
               className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 placeholder:text-slate-400"
             />
           </div>
@@ -336,7 +293,6 @@ export default function BillingPage() {
             className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500"
           >
             <option value="all">All Status</option>
-
             {STATUSES.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -352,9 +308,10 @@ export default function BillingPage() {
                 <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                   {[
                     "#",
-                    "Patient",
-                    "Bill Name",
-                    "Amount",
+                    "Medicine",
+                    "Category",
+                    "Quantity",
+                    "Price",
                     "Status",
                     "Actions",
                   ].map((h) => (
@@ -372,75 +329,67 @@ export default function BillingPage() {
                 {loading ? (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       className="p-6 text-center text-slate-500 dark:text-slate-300"
                     >
-                      Loading bills...
+                      Loading medicines...
                     </td>
                   </tr>
                 ) : filtered.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       className="p-8 text-center text-slate-500 dark:text-slate-300"
                     >
-                      No bills found.
+                      No medicines found.
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((b, i) => (
+                  filtered.map((medicine, index) => (
                     <tr
-                      key={b.id}
-                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition"
+                      key={medicine.id}
+                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/70"
                     >
                       <td className="px-4 py-3 text-slate-400 dark:text-slate-500 font-mono text-xs">
-                        {i + 1}
+                        {index + 1}
                       </td>
 
                       <td className="px-4 py-3 font-semibold text-slate-800 dark:text-white">
-                        {fullName(b.patient) || "—"}
+                        {medicine.medicineName || "—"}
                       </td>
 
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                        {b.billName || "—"}
+                        {medicine.category || "—"}
                       </td>
 
                       <td className="px-4 py-3 font-bold text-slate-800 dark:text-white">
-                        ₦{Number(b.amount || 0).toLocaleString()}
+                        {medicine.quantity}
+                      </td>
+
+                      <td className="px-4 py-3 font-bold text-slate-800 dark:text-white">
+                        ₦{Number(medicine.price || 0).toLocaleString()}
                       </td>
 
                       <td className="px-4 py-3">
-                        <StatusBadge status={b.status} />
+                        <StatusBadge
+                          status={generateStatus(medicine.quantity)}
+                        />
                       </td>
 
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
                           <button
-                            onClick={() => openEdit(b)}
+                            onClick={() => openEdit(medicine)}
                             className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
-                            onClick={() => openDelete(b)}
+                            onClick={() => openDelete(medicine)}
                             className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer"
                           >
                             <Trash2 size={15} />
-                          </button>
-
-                          <button
-                            onClick={() => handleMarkAsPaid(b)}
-                            disabled={b.status?.toLowerCase() === "paid"}
-                            className={`px-3 py-2 rounded-lg text-xs text-white cursor-pointer disabled:cursor-not-allowed ${
-                              b.status?.toLowerCase() === "paid"
-                                ? "bg-gray-400 dark:bg-gray-600"
-                                : "bg-green-600 hover:bg-green-700"
-                            }`}
-                          >
-                            {b.status?.toLowerCase() === "paid"
-                              ? "Paid"
-                              : "Mark Paid"}
                           </button>
                         </div>
                       </td>
@@ -453,14 +402,16 @@ export default function BillingPage() {
         </div>
       </div>
 
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add Bill">
-        <BillForm
-          onSubmit={handleAdd}
-          submitLabel="Create Bill"
+      <Modal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        title="Add Medicine"
+      >
+        <MedicineForm
           form={form}
           handleChange={handleChange}
-          patients={patients}
-          fullName={fullName}
+          onSubmit={handleAdd}
+          submitLabel="Add Medicine"
           saving={saving}
         />
       </Modal>
@@ -468,15 +419,13 @@ export default function BillingPage() {
       <Modal
         open={editOpen}
         onClose={() => setEditOpen(false)}
-        title="Edit Bill"
+        title="Edit Medicine"
       >
-        <BillForm
-          onSubmit={handleEdit}
-          submitLabel="Save Changes"
+        <MedicineForm
           form={form}
           handleChange={handleChange}
-          patients={patients}
-          fullName={fullName}
+          onSubmit={handleEdit}
+          submitLabel="Save Changes"
           saving={saving}
         />
       </Modal>
@@ -486,8 +435,8 @@ export default function BillingPage() {
         onClose={() => setDelOpen(false)}
         onConfirm={handleDelete}
         loading={saving}
-        title="Delete Bill"
-        message="Delete this billing record?"
+        title="Delete Medicine"
+        message="Are you sure you want to delete this medicine?"
       />
     </DashboardLayout>
   );
@@ -506,61 +455,42 @@ function Toast({ type, message }) {
   );
 }
 
-function BillForm({
-  onSubmit,
-  submitLabel,
-  form,
-  handleChange,
-  patients,
-  fullName,
-  saving,
-}) {
+function MedicineForm({ form, handleChange, onSubmit, submitLabel, saving }) {
   return (
     <div className="space-y-4">
-      <FormSelect
-        label="Patient"
-        name="patientId"
-        value={form.patientId}
-        onChange={handleChange}
-      >
-        <option value="">Select patient</option>
-
-        {patients.map((p) => (
-          <option key={p.id} value={p.id}>
-            {fullName(p)}
-          </option>
-        ))}
-      </FormSelect>
-
       <FormInput
-        label="Bill Name"
-        name="billName"
-        value={form.billName}
+        label="Medicine Name"
+        name="medicineName"
+        value={form.medicineName}
         onChange={handleChange}
-        placeholder="Consultation fee"
+        placeholder="Paracetamol"
       />
 
       <FormInput
-        label="Amount (₦)"
-        name="amount"
+        label="Category"
+        name="category"
+        value={form.category}
+        onChange={handleChange}
+        placeholder="Pain Relief"
+      />
+
+      <FormInput
+        label="Quantity"
+        name="quantity"
         type="number"
-        value={form.amount}
+        value={form.quantity}
         onChange={handleChange}
-        placeholder="0"
+        placeholder="20"
       />
 
-      <FormSelect
-        label="Status"
-        name="status"
-        value={form.status}
+      <FormInput
+        label="Price (₦)"
+        name="price"
+        type="number"
+        value={form.price}
         onChange={handleChange}
-      >
-        {STATUSES.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </FormSelect>
+        placeholder="1000"
+      />
 
       <button
         onClick={onSubmit}
@@ -578,13 +508,11 @@ function SummaryCard({ label, value }) {
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5">
       <div className="flex items-center gap-3">
         <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300">
-          <CreditCard size={18} />
+          <Pill size={18} />
         </div>
 
         <div>
-          <p className="text-xs text-slate-400 dark:text-slate-400 font-bold uppercase">
-            {label}
-          </p>
+          <p className="text-xs text-slate-400 font-bold uppercase">{label}</p>
           <p className="text-xl font-extrabold text-slate-800 dark:text-white">
             {value}
           </p>
@@ -598,9 +526,9 @@ function StatusBadge({ status }) {
   const s = status?.toLowerCase()?.trim();
 
   const cls =
-    s === "paid"
+    s === "available"
       ? "bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-300"
-      : s === "pending"
+      : s === "low stock"
         ? "bg-yellow-100 dark:bg-yellow-950/40 text-yellow-700 dark:text-yellow-300"
         : "bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300";
 
@@ -633,25 +561,6 @@ function FormInput({
         placeholder={placeholder}
         className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 placeholder:text-slate-400"
       />
-    </div>
-  );
-}
-
-function FormSelect({ label, name, value, onChange, children }) {
-  return (
-    <div>
-      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
-        {label}
-      </label>
-
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500"
-      >
-        {children}
-      </select>
     </div>
   );
 }

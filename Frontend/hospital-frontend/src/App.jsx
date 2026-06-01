@@ -14,6 +14,9 @@ import ReceptionistDashboard from "./pages/ReceptionistDashboard";
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientRegister from "./pages/PatientRegister";
 import BookAppointmentPage from "./pages/BookAppointmentPage";
+import PatientAppointmentsPage from "./pages/PatientAppointmentPage";
+import PharmacyPage from "./pages/PharmacyPage";
+import ChatPage from "./pages/ChatPage";
 
 export default function App() {
   return (
@@ -26,20 +29,12 @@ export default function App() {
           path="/patient/book-appointment"
           element={<BookAppointmentPage />}
         />
+
         <Route
           path="/admin"
           element={
             <ProtectedRoute>
               <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/patients"
-          element={
-            <ProtectedRoute>
-              <PatientsPage />
             </ProtectedRoute>
           }
         />
@@ -54,10 +49,28 @@ export default function App() {
         />
 
         <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/doctor-shifts"
           element={
             <ProtectedRoute>
               <DoctorShiftsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/pharmacy"
+          element={
+            <ProtectedRoute>
+              <PharmacyPage />
             </ProtectedRoute>
           }
         />
@@ -112,6 +125,24 @@ export default function App() {
           element={
             <ProtectedRoute>
               <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patients"
+          element={
+            <ProtectedRoute>
+              <PatientsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient/appointments"
+          element={
+            <ProtectedRoute>
+              <PatientAppointmentsPage />
             </ProtectedRoute>
           }
         />

@@ -4,19 +4,56 @@ import api from "../api/api";
 import {
   Eye,
   EyeOff,
-  Stethoscope,
+  Mail,
+  Lock,
   ShieldCheck,
-  Activity,
+  CalendarDays,
+  BarChart3,
   Users,
+  Headphones,
+  Cloud,
+  Stethoscope,
+  ArrowRight,
+  UserPlus,
 } from "lucide-react";
 
-function FeatureBadge({ icon: Icon, text }) {
+import loginBg from "../assets/videos/286443_medium.mp4";
+
+const avatars = [
+  "https://i.pravatar.cc/40?img=1",
+  "https://i.pravatar.cc/40?img=5",
+  "https://i.pravatar.cc/40?img=8",
+  "https://i.pravatar.cc/40?img=12",
+];
+
+function FeatureCard({ icon: Icon, title, text }) {
   return (
-    <div className="flex items-center gap-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-3.5 py-2.5">
-      <div className="p-1.5 rounded-lg bg-white/20">
-        <Icon size={14} className="text-white" />
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md hover:bg-white/[0.08] transition">
+      <div className="flex gap-4 items-start">
+        <div className="w-11 h-11 rounded-xl bg-blue-600/25 text-cyan-300 flex items-center justify-center shrink-0">
+          <Icon size={20} />
+        </div>
+
+        <div>
+          <h3 className="text-white font-bold text-sm">{title}</h3>
+          <p className="text-white/55 text-xs mt-1 leading-relaxed">{text}</p>
+        </div>
       </div>
-      <span className="text-white/90 text-sm font-medium">{text}</span>
+    </div>
+  );
+}
+
+function TrustBadge({ icon: Icon, title, text }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-black/25 border border-white/10 px-5 py-3 backdrop-blur-xl">
+      <div className="w-10 h-10 rounded-xl bg-white/10 text-cyan-300 flex items-center justify-center shrink-0">
+        <Icon size={19} />
+      </div>
+
+      <div>
+        <p className="text-white font-bold text-sm leading-tight">{title}</p>
+        <p className="text-white/55 text-xs">{text}</p>
+      </div>
     </div>
   );
 }
@@ -24,20 +61,13 @@ function FeatureBadge({ icon: Icon, text }) {
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const goByRole = (role) => {
@@ -45,18 +75,16 @@ export default function LoginPage() {
     else if (role === "DOCTOR") navigate("/doctor");
     else if (role === "RECEPTIONIST") navigate("/receptionist");
     else if (role === "PATIENT") navigate("/patient");
-    else navigate("/admin");
+    else navigate("/login");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
     setError("");
 
     try {
       const res = await api.post("/auth/login", form);
-
       const { token, role, user } = res.data;
 
       localStorage.setItem("token", token);
@@ -75,177 +103,213 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex font-sans">
-      <div className="hidden lg:flex flex-col justify-between w-[52%] bg-gradient-to-br from-[#0a1628] via-[#0d2244] to-[#0a3060] px-14 py-12 relative overflow-hidden">
-        <div className="absolute top-[-80px] left-[-80px] w-80 h-80 rounded-full bg-blue-600/20 blur-3xl" />
-        <div className="absolute bottom-[-60px] right-[-60px] w-96 h-96 rounded-full bg-cyan-500/15 blur-3xl" />
-        <div className="absolute top-1/2 left-1/3 w-48 h-48 rounded-full bg-blue-400/10 blur-2xl" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-slate-950 text-white">
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        className="fixed inset-0 h-full w-full object-cover opacity-100"
+      >
+        <source src={loginBg} type="video/mp4" />
+      </video>
 
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+      <div className="fixed inset-0 bg-black/35" />
+      <div className="fixed inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/35 to-slate-950/20" />
 
-        <div className="relative flex items-center gap-3">
-          <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-xl shadow-blue-900/50">
-            <Stethoscope size={22} className="text-white" />
-          </div>
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:52px_52px]" />
 
-          <div>
-            <p className="text-white font-extrabold text-xl tracking-tight">
-              MediCore
-            </p>
-            <p className="text-cyan-400/80 text-[10px] font-bold tracking-[4px] uppercase">
-              HMS Platform
-            </p>
-          </div>
-        </div>
-
-        <div className="relative space-y-6">
-          <div>
-            <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.15] tracking-tight">
-              Smart Hospital
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                Operations,
-              </span>
-              <br />
-              Simplified.
-            </h1>
-
-            <p className="mt-4 text-white/60 text-base leading-relaxed max-w-sm">
-              A unified platform for patient management, appointments, billing,
-              and clinical records — all in one place.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <FeatureBadge icon={Users} text="Patient Management" />
-            <FeatureBadge icon={Activity} text="Live Analytics" />
-            <FeatureBadge icon={ShieldCheck} text="Protected Access" />
-            <FeatureBadge icon={Stethoscope} text="Clinical Records" />
-          </div>
-        </div>
-
-        <p className="relative text-white/30 text-xs">
-          © {new Date().getFullYear()} MediCore HMS.
-        </p>
-      </div>
-
-      <div className="flex flex-1 items-center justify-center px-6 py-12 relative overflow-hidden bg-gradient-to-br from-[#07111f] via-[#0b1d3a] to-[#07111f] lg:bg-slate-50">
-        <div className="absolute inset-0 lg:hidden">
-          <div className="absolute top-[-80px] right-[-80px] w-72 h-72 rounded-full bg-cyan-500/25 blur-3xl" />
-          <div className="absolute bottom-[-80px] left-[-80px] w-80 h-80 rounded-full bg-blue-600/30 blur-3xl" />
-          <div className="absolute top-1/3 left-1/2 w-52 h-52 rounded-full bg-indigo-500/10 blur-3xl" />
-
-          <div
-            className="absolute inset-0 opacity-[0.05]"
-            style={{
-              backgroundImage:
-                "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-              backgroundSize: "36px 36px",
-            }}
-          />
-
-          <div className="absolute top-20 left-10 w-2 h-2 rounded-full bg-cyan-300 animate-pulse" />
-          <div className="absolute top-40 right-16 w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping" />
-          <div className="absolute bottom-32 left-16 w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-1.5 h-1.5 rounded-full bg-blue-300 animate-ping" />
-        </div>
-
-        <div className="absolute -inset-10 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none lg:hidden" />
-
-        <div
+      <div className="relative z-10 min-h-screen grid lg:grid-cols-[46%_54%]">
+        <section
           className="
-            w-full
-            max-w-[400px]
-            relative
-            bg-white/[0.08]
-            lg:bg-transparent
-            border
-            border-white/10
-            lg:border-transparent
-            backdrop-blur-2xl
-            lg:backdrop-blur-none
-            rounded-[32px]
-            lg:rounded-none
-            p-7
-            lg:p-0
-            overflow-hidden
-            shadow-[0_8px_40px_rgba(0,0,0,0.35)]
-            lg:shadow-none
-            before:absolute
-            before:inset-0
-            before:rounded-[32px]
-            before:bg-gradient-to-br
-            before:from-white/10
-            before:to-transparent
-            before:pointer-events-none
-            lg:before:hidden
-          "
+    hidden lg:flex
+    relative
+    flex-col
+    justify-between
+    px-14
+    py-12
+    bg-[#010048]
+    border-r
+    border-cyan-500/20
+    overflow-hidden
+    rounded-br-[120px]
+    shadow-[0_0_80px_rgba(0,120,255,0.15)]
+  "
         >
-          <div className="absolute inset-[1px] rounded-[31px] border border-cyan-400/10 pointer-events-none lg:hidden" />
+          <div className="absolute -right-32 bottom-[-80px] w-[350px] h-[350px] rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="absolute top-32 left-40 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+          <div className="absolute top-72 left-72 w-1 h-1 bg-blue-300 rounded-full animate-pulse" />
+          <div className="absolute bottom-44 left-52 w-2 h-2 bg-cyan-300 rounded-full animate-pulse" />
 
-          <div className="absolute inset-0 opacity-[0.06] pointer-events-none lg:hidden">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage:
-                  "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-                backgroundSize: "28px 28px",
-              }}
-            />
-          </div>
-
-          <div className="absolute top-[-40px] right-[-40px] w-40 h-40 rounded-full bg-cyan-400/20 blur-3xl lg:hidden" />
-          <div className="absolute bottom-[-40px] left-[-40px] w-40 h-40 rounded-full bg-blue-500/20 blur-3xl lg:hidden" />
-
-          <div className="relative">
-            <div className="flex lg:hidden items-center gap-2.5 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_25px_rgba(34,211,238,0.45)]">
-                <Stethoscope size={18} className="text-white" />
-              </div>
-              <span className="text-white font-extrabold text-lg">
-                MediCore HMS
-              </span>
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/60">
+              <Stethoscope size={22} className="text-white" />
             </div>
 
-            <div className="mb-8">
-              <h2 className="text-3xl lg:text-2xl font-extrabold text-white lg:text-slate-800 tracking-tight">
-                Welcome back
+            <div>
+              <h2 className="text-xl font-extrabold leading-none tracking-wide">
+                MediCore
               </h2>
-              <p className="text-white/60 lg:text-slate-500 text-sm mt-1">
-                Sign in to your workspace
+              <p className="text-cyan-400 text-[10px] tracking-[0.4em] font-bold mt-0.5">
+                HMS PLATFORM
+              </p>
+            </div>
+          </div>
+
+          <div className="max-w-[580px]">
+            <h1 className="text-5xl xl:text-[3.4rem] font-black leading-[1.08] tracking-tight">
+              Smart Healthcare,
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                Better Outcomes
+              </span>
+            </h1>
+
+            <div className="w-36 h-[3px] rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 mt-6 shadow-[0_0_18px_rgba(34,211,238,0.75)]" />
+
+            <p className="text-white/70 text-base leading-relaxed mt-6 max-w-lg">
+              A unified platform for patient management, appointments, billing,
+              consultation, prescriptions, and clinical records.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <FeatureCard
+                icon={Users}
+                title="Patient Management"
+                text="Efficiently manage patient information and history"
+              />
+
+              <FeatureCard
+                icon={CalendarDays}
+                title="Smart Appointments"
+                text="Schedule and manage appointments seamlessly"
+              />
+
+              <FeatureCard
+                icon={ShieldCheck}
+                title="Secure & Private"
+                text="Enterprise-grade security for hospital data"
+              />
+
+              <FeatureCard
+                icon={BarChart3}
+                title="Analytics & Reports"
+                text="Real-time insights for better decisions"
+              />
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-blue-600/25 flex items-center justify-center text-cyan-300 shrink-0">
+                  <ShieldCheck size={20} />
+                </div>
+
+                <div>
+                  <p className="font-bold text-sm text-white">
+                    Trusted by Hospitals
+                  </p>
+                  <p className="text-white/55 text-xs">
+                    Modern. Secure. Reliable.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {avatars.map((src, index) => (
+                    <img
+                      key={index}
+                      src={src}
+                      alt="Hospital user"
+                      className="w-8 h-8 rounded-full border-2 border-slate-800 object-cover"
+                    />
+                  ))}
+                </div>
+
+                <div className="rounded-xl bg-blue-600/45 px-4 py-2 text-center min-w-[70px]">
+                  <p className="text-cyan-200 font-black text-lg leading-none">
+                    500+
+                  </p>
+                  <p className="text-white/55 text-[10px] mt-0.5">Hospitals</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-white/40 text-xs">
+            © {new Date().getFullYear()} MediCore HMS. All rights reserved.
+          </p>
+        </section>
+
+        <section className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-5 py-5 sm:py-8">
+          <div className="lg:hidden mb-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/60">
+              <Stethoscope size={20} className="text-white" />
+            </div>
+
+            <div>
+              <h2 className="text-lg font-extrabold leading-none tracking-wide">
+                MediCore
+              </h2>
+              <p className="text-cyan-300 text-[9px] tracking-[0.35em] font-bold mt-0.5">
+                HMS PLATFORM
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full max-w-[420px] rounded-[26px] border border-white/15 bg-white/[0.06] backdrop-blur-md shadow-[0_20px_80px_rgba(0,0,0,0.45)] px-5 sm:px-8 py-6 sm:py-8">
+            <div className="mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/15 border border-white/20 flex items-center justify-center mb-4 shadow-[0_0_40px_rgba(34,211,238,0.25)]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+                <Stethoscope size={21} className="text-white" />
+              </div>
+            </div>
+
+            <div className="text-center mb-5">
+              <h2 className="text-2xl sm:text-[1.75rem] font-black tracking-tight">
+                Welcome Back
+              </h2>
+
+              <p className="text-white/65 text-xs sm:text-sm mt-1">
+                Sign in to continue to your account
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-white/60 lg:text-slate-500 uppercase tracking-widest">
-                  Email
+              <div>
+                <label className="block text-xs sm:text-sm font-semibold text-white/80 mb-1.5">
+                  Email Address
                 </label>
 
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-white/10 lg:border-slate-200 bg-white/10 lg:bg-white text-white lg:text-slate-800 placeholder-white/40 lg:placeholder-slate-400 outline-none transition-all hover:border-cyan-400/40 lg:hover:border-slate-300 focus:border-cyan-400 lg:focus:border-blue-500 focus:ring-4 focus:ring-cyan-400/20 lg:focus:ring-blue-500/10 shadow-inner shadow-black/20 lg:shadow-none"
-                />
+                <div className="relative">
+                  <Mail
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/45"
+                  />
+
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"
+                    required
+                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/[0.07] pl-11 pr-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-white/60 lg:text-slate-500 uppercase tracking-widest">
+              <div>
+                <label className="block text-xs sm:text-sm font-semibold text-white/80 mb-1.5">
                   Password
                 </label>
 
                 <div className="relative">
+                  <Lock
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/45"
+                  />
+
                   <input
                     type={showPw ? "text" : "password"}
                     name="password"
@@ -253,21 +317,35 @@ export default function LoginPage() {
                     onChange={handleChange}
                     placeholder="Enter your password"
                     required
-                    className="w-full px-4 py-3 pr-11 rounded-xl border border-white/10 lg:border-slate-200 bg-white/10 lg:bg-white text-white lg:text-slate-800 placeholder-white/40 lg:placeholder-slate-400 outline-none transition-all hover:border-cyan-400/40 lg:hover:border-slate-300 focus:border-cyan-400 lg:focus:border-blue-500 focus:ring-4 focus:ring-cyan-400/20 lg:focus:ring-blue-500/10 shadow-inner shadow-black/20 lg:shadow-none"
+                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/[0.07] pl-11 pr-11 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
                   />
 
                   <button
                     type="button"
-                    onClick={() => setShowPw((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 lg:text-slate-400 hover:text-cyan-300 lg:hover:text-slate-600 cursor-pointer"
+                    onClick={() => setShowPw((value) => !value)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/45 hover:text-cyan-300 transition"
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <label className="flex items-center gap-2 text-white/65 cursor-pointer select-none">
+                  <input type="checkbox" className="accent-cyan-400 w-4 h-4" />
+                  Remember me
+                </label>
+
+                <button
+                  type="button"
+                  className="text-cyan-300 font-semibold hover:text-cyan-200 transition"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
               {error && (
-                <div className="bg-red-500/10 border border-red-400/20 text-red-200 lg:bg-red-50 lg:border-red-200 lg:text-red-600 text-xs px-3.5 py-2.5 rounded-xl">
+                <div className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-red-200 text-sm">
                   {error}
                 </div>
               )}
@@ -275,44 +353,49 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="
-                  w-full
-                  py-3.5
-                  rounded-2xl
-                  bg-gradient-to-r
-                  from-blue-500
-                  via-cyan-500
-                  to-blue-600
-                  hover:scale-[1.02]
-                  active:scale-[0.98]
-                  text-white
-                  font-bold
-                  text-sm
-                  transition-all
-                  duration-300
-                  shadow-[0_0_25px_rgba(59,130,246,0.55)]
-                  hover:shadow-[0_0_35px_rgba(34,211,238,0.75)]
-                  disabled:opacity-60
-                  disabled:cursor-not-allowed
-                  cursor-pointer
-                "
+                className="w-full h-[48px] sm:h-[52px] rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600 text-white font-bold text-sm shadow-[0_12px_35px_rgba(37,99,235,0.4)] hover:scale-[1.015] active:scale-[0.985] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                {loading ? "Signing in…" : "Sign In →"}
+                {loading ? (
+                  "Signing In..."
+                ) : (
+                  <>
+                    Sign In <ArrowRight size={17} />
+                  </>
+                )}
               </button>
 
-              <p className="text-sm text-center mt-5 text-white/60 lg:text-slate-500">
-                Don’t have a patient account?{" "}
+              <div className="flex items-center gap-3 text-white/40 text-xs">
+                <div className="h-px flex-1 bg-white/15" />
+                OR
+                <div className="h-px flex-1 bg-white/15" />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate("/patient-register")}
+                className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/20 bg-white/[0.05] hover:bg-white/[0.1] text-white font-semibold text-sm flex items-center justify-center gap-2 transition"
+              >
+                Create Patient Account <UserPlus size={17} />
+              </button>
+
+              <p className="text-center text-white/60 text-xs sm:text-sm">
+                Need Help?{" "}
                 <button
                   type="button"
-                  onClick={() => navigate("/patient-register")}
-                  className="text-cyan-400 lg:text-blue-600 font-bold hover:underline"
+                  className="text-cyan-300 font-semibold hover:text-cyan-200 transition"
                 >
-                  Create Account
+                  Contact Support
                 </button>
               </p>
             </form>
           </div>
-        </div>
+
+          <div className="hidden lg:flex gap-4 mt-8">
+            <TrustBadge icon={ShieldCheck} title="HIPAA" text="Compliant" />
+            <TrustBadge icon={Headphones} title="24/7" text="Support" />
+            <TrustBadge icon={Cloud} title="Cloud" text="Secure" />
+          </div>
+        </section>
       </div>
     </div>
   );

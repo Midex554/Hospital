@@ -48,7 +48,7 @@ export default function MedicalRecordsPage() {
   const [saving, setSaving] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [alert, setAlert] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -57,6 +57,11 @@ export default function MedicalRecordsPage() {
 
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const fetchAll = async () => {
     setLoading(true);
@@ -72,11 +77,10 @@ export default function MedicalRecordsPage() {
       setPatients(normalizeArray(pRes.data));
       setDoctors(normalizeArray(dRes.data));
     } catch (error) {
-      setAlert({
-        type: "error",
-        message:
-          error.response?.data?.message || "Failed to load medical records.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to load medical records."
+      );
     } finally {
       setLoading(false);
     }
@@ -89,7 +93,8 @@ export default function MedicalRecordsPage() {
   const stats = useMemo(() => {
     return {
       records: records.length,
-      patients: new Set(records.map((r) => r.patient?.id).filter(Boolean)).size,
+      patients: new Set(records.map((r) => r.patient?.id).filter(Boolean))
+        .size,
       doctors: new Set(records.map((r) => r.doctor?.id).filter(Boolean)).size,
       prescriptions: records.filter((r) => r.prescription).length,
     };
@@ -107,7 +112,7 @@ export default function MedicalRecordsPage() {
       ]
         .join(" ")
         .toLowerCase()
-        .includes(search.toLowerCase()),
+        .includes(search.toLowerCase())
     );
   }, [records, search]);
 
@@ -120,19 +125,6 @@ export default function MedicalRecordsPage() {
     }));
   };
 
-  const toPayload = () => ({
-    diagnosis: form.diagnosis,
-    treatment: form.treatment,
-    prescription: form.prescription,
-    notes: form.notes,
-    patient: {
-      id: Number(form.patientId),
-    },
-    doctor: {
-      id: Number(form.doctorId),
-    },
-  });
-
   const validateForm = () => {
     if (!form.patientId) return "Please select a patient.";
     if (!form.doctorId) return "Please select a doctor.";
@@ -141,12 +133,26 @@ export default function MedicalRecordsPage() {
     return null;
   };
 
+  const toPayload = () => ({
+    diagnosis: form.diagnosis.trim(),
+    treatment: form.treatment.trim(),
+    prescription: form.prescription.trim(),
+    notes: form.notes.trim(),
+    patient: {
+      id: Number(form.patientId),
+    },
+    doctor: {
+      id: Number(form.doctorId),
+    },
+  });
+
   const handleAdd = async (e) => {
     e.preventDefault();
 
     const errorMessage = validateForm();
+
     if (errorMessage) {
-      setAlert({ type: "error", message: errorMessage });
+      showToast("error", errorMessage);
       return;
     }
 
@@ -158,16 +164,15 @@ export default function MedicalRecordsPage() {
       });
 
       setRecords((prev) => [...prev, res.data]);
-      setAlert({ type: "success", message: "Medical record created." });
+      showToast("success", "Medical record created.");
 
       setAddOpen(false);
       setForm(EMPTY_FORM);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message:
-          error.response?.data?.message || "Failed to create medical record.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to create medical record."
+      );
     } finally {
       setSaving(false);
     }
@@ -194,37 +199,33 @@ export default function MedicalRecordsPage() {
     if (!selected) return;
 
     const errorMessage = validateForm();
+
     if (errorMessage) {
-      setAlert({ type: "error", message: errorMessage });
+      showToast("error", errorMessage);
       return;
     }
 
     setSaving(true);
 
     try {
-      const res = await api.put(
-        `/medical-records/${selected.id}`,
-        toPayload(),
-        {
-          headers: authHeader(),
-        },
-      );
+      const res = await api.put(`/medical-records/${selected.id}`, toPayload(), {
+        headers: authHeader(),
+      });
 
       setRecords((prev) =>
-        prev.map((record) => (record.id === selected.id ? res.data : record)),
+        prev.map((record) => (record.id === selected.id ? res.data : record))
       );
 
-      setAlert({ type: "success", message: "Medical record updated." });
+      showToast("success", "Medical record updated.");
 
       setEditOpen(false);
       setSelected(null);
       setForm(EMPTY_FORM);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message:
-          error.response?.data?.message || "Failed to update medical record.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to update medical record."
+      );
     } finally {
       setSaving(false);
     }
@@ -247,16 +248,15 @@ export default function MedicalRecordsPage() {
 
       setRecords((prev) => prev.filter((record) => record.id !== selected.id));
 
-      setAlert({ type: "success", message: "Medical record deleted." });
+      showToast("success", "Medical record deleted.");
 
       setDelOpen(false);
       setSelected(null);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message:
-          error.response?.data?.message || "Failed to delete medical record.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to delete medical record."
+      );
     } finally {
       setSaving(false);
     }
@@ -269,6 +269,8 @@ export default function MedicalRecordsPage() {
 
   return (
     <DashboardLayout title="Medical Records">
+      {toast && <Toast type={toast.type} message={toast.message} />}
+
       <div className="max-w-[1400px] mx-auto space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard
@@ -304,12 +306,12 @@ export default function MedicalRecordsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-800">
+            <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
               Medical Records
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 dark:text-slate-400">
               Manage diagnosis, treatment, prescriptions, and doctor notes
             </p>
           </div>
@@ -318,7 +320,7 @@ export default function MedicalRecordsPage() {
             <button
               type="button"
               onClick={fetchAll}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 cursor-pointer transition"
+              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 cursor-pointer transition"
             >
               <RefreshCw size={16} />
             </button>
@@ -329,7 +331,7 @@ export default function MedicalRecordsPage() {
                 setForm(EMPTY_FORM);
                 setAddOpen(true);
               }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200 dark:shadow-none"
             >
               <Plus size={16} />
               Add Record
@@ -347,15 +349,15 @@ export default function MedicalRecordsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by patient, doctor, diagnosis, treatment..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition"
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition placeholder:text-slate-400"
           />
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[1100px]">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
+                <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
                   {[
                     "#",
                     "Patient",
@@ -367,7 +369,7 @@ export default function MedicalRecordsPage() {
                   ].map((heading) => (
                     <th
                       key={heading}
-                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap"
+                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-300 uppercase tracking-widest whitespace-nowrap"
                     >
                       {heading}
                     </th>
@@ -378,7 +380,10 @@ export default function MedicalRecordsPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="p-10 text-center text-slate-500">
+                    <td
+                      colSpan="7"
+                      className="p-10 text-center text-slate-500 dark:text-slate-300"
+                    >
                       Loading records...
                     </td>
                   </tr>
@@ -395,29 +400,29 @@ export default function MedicalRecordsPage() {
                   filtered.map((record, index) => (
                     <tr
                       key={record.id}
-                      className="border-b border-slate-50 hover:bg-blue-50/40 hover:scale-[1.002] transition-all duration-200"
+                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition-all duration-200"
                     >
-                      <td className="px-4 py-3 text-slate-400 font-mono text-xs">
+                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 font-mono text-xs">
                         {index + 1}
                       </td>
 
-                      <td className="px-4 py-3 font-semibold text-slate-800">
+                      <td className="px-4 py-3 font-semibold text-slate-800 dark:text-white">
                         {fullName(record.patient) || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {fullName(record.doctor) || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[190px] truncate">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[190px] truncate">
                         {record.diagnosis || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[190px] truncate">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[190px] truncate">
                         {record.treatment || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[230px] truncate">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[230px] truncate">
                         {record.prescription || "—"}
                       </td>
 
@@ -426,7 +431,7 @@ export default function MedicalRecordsPage() {
                           <button
                             type="button"
                             onClick={() => openView(record)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-600 cursor-pointer transition"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-950/40 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition"
                           >
                             <Eye size={15} />
                           </button>
@@ -434,7 +439,7 @@ export default function MedicalRecordsPage() {
                           <button
                             type="button"
                             onClick={() => openEdit(record)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-green-100 text-slate-600 hover:text-green-600 cursor-pointer transition"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer transition"
                           >
                             <Edit2 size={15} />
                           </button>
@@ -442,7 +447,7 @@ export default function MedicalRecordsPage() {
                           <button
                             type="button"
                             onClick={() => openDelete(record)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-600 hover:text-red-600 cursor-pointer transition"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer transition"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -456,7 +461,7 @@ export default function MedicalRecordsPage() {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400 flex justify-between">
+            <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400 dark:text-slate-400 flex justify-between">
               <span>
                 Showing {filtered.length} of {records.length} medical records
               </span>
@@ -527,6 +532,19 @@ export default function MedicalRecordsPage() {
         message="Delete this medical record permanently?"
       />
     </DashboardLayout>
+  );
+}
+
+function Toast({ type, message }) {
+  const styles =
+    type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white";
+
+  return (
+    <div
+      className={`fixed top-6 right-6 z-[9999] px-5 py-3 rounded-xl shadow-lg text-sm font-semibold ${styles}`}
+    >
+      {message}
+    </div>
   );
 }
 
@@ -643,11 +661,13 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
 function EmptyState({ title, text }) {
   return (
     <div className="flex flex-col items-center justify-center text-center">
-      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+      <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 flex items-center justify-center mb-3">
         <ClipboardPlus size={22} />
       </div>
-      <h3 className="text-sm font-bold text-slate-700">{title}</h3>
-      <p className="text-xs text-slate-400 mt-1">{text}</p>
+      <h3 className="text-sm font-bold text-slate-700 dark:text-white">
+        {title}
+      </h3>
+      <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">{text}</p>
     </div>
   );
 }
@@ -655,7 +675,7 @@ function EmptyState({ title, text }) {
 function FormTextarea({ label, name, value, onChange, placeholder }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
         {label}
       </label>
 
@@ -665,7 +685,7 @@ function FormTextarea({ label, name, value, onChange, placeholder }) {
         onChange={onChange}
         placeholder={placeholder}
         rows={4}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none placeholder:text-slate-400"
       />
     </div>
   );
@@ -674,7 +694,7 @@ function FormTextarea({ label, name, value, onChange, placeholder }) {
 function FormSelect({ label, name, value, onChange, children }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
         {label}
       </label>
 
@@ -682,7 +702,7 @@ function FormSelect({ label, name, value, onChange, children }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 bg-white"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       >
         {children}
       </select>
@@ -692,12 +712,12 @@ function FormSelect({ label, name, value, onChange, children }) {
 
 function Detail({ label, value }) {
   return (
-    <div className="bg-slate-50 rounded-xl px-3 py-3">
+    <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-3">
       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
         {label}
       </p>
 
-      <p className="text-slate-700 font-medium mt-1 whitespace-pre-wrap">
+      <p className="text-slate-700 dark:text-white font-medium mt-1 whitespace-pre-wrap">
         {value || "—"}
       </p>
     </div>
@@ -708,18 +728,20 @@ function Drawer({ open, onClose, title, subtitle, children }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/20 backdrop-blur-sm">
-      <div className="h-full w-full max-w-xl bg-white shadow-2xl overflow-y-auto animate-slideIn">
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
+      <div className="h-full w-full max-w-xl bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-2xl overflow-y-auto animate-slideIn">
+        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800">{title}</h2>
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+              {title}
+            </h2>
             <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
+            className="w-9 h-9 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/40 text-slate-400 hover:text-red-500 flex items-center justify-center transition"
           >
             <X size={18} />
           </button>
@@ -735,17 +757,21 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center">
-        <h2 className="text-xl font-extrabold text-red-600 mb-3">{title}</h2>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border border-slate-100 dark:border-slate-700">
+        <h2 className="text-xl font-extrabold text-red-600 dark:text-red-400 mb-3">
+          {title}
+        </h2>
 
-        <p className="text-sm text-slate-600 mb-6">{message}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+          {message}
+        </p>
 
         <div className="flex justify-center gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300"
+            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
           >
             Cancel
           </button>
