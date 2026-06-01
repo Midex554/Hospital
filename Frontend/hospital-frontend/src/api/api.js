@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://13.48.248.230:8080/api",
+  baseURL: "https://publicly-documented-ranger-shadows.trycloudflare.com/api",
 });
 
 api.interceptors.request.use((config) => {
