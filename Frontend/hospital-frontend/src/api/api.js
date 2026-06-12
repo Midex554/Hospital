@@ -1,9 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://hospital-production-644e.up.railway.app/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
 });
-
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
