@@ -72,6 +72,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/test-results/**", "/api/test-results")
                         .hasAnyAuthority("ADMIN", "DOCTOR", "PATIENT")
 
+                        .requestMatchers("/uploads/test-results/**").permitAll()
+
                         .requestMatchers("/api/bills/**")
                         .hasAnyAuthority("ADMIN", "RECEPTIONIST")
 
