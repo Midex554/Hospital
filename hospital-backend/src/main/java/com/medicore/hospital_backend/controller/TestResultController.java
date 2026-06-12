@@ -168,7 +168,7 @@ public class TestResultController {
         result.setReviewedAt(LocalDateTime.now());
 
         return testResultRepository.save(result);
-    }git
+    }
 
     @DeleteMapping("/{id}")
     public void deleteTestResult(@PathVariable Long id) {
