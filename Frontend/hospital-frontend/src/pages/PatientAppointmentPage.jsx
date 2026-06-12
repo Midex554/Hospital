@@ -42,21 +42,21 @@ export default function PatientAppointmentsPage() {
     <DashboardLayout title="My Appointments">
       <div className="max-w-6xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-800">
+          <h1 className="text-3xl font-extrabold text-slate-800 dark:text-white">
             My Appointments
           </h1>
 
-          <p className="text-slate-500 mt-1">
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             View your appointment history and assigned doctors.
           </p>
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-slate-100">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-10 text-center shadow-sm border border-slate-100 dark:border-slate-700">
             Loading appointments...
           </div>
         ) : appointments.length === 0 ? (
-          <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-slate-100">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-10 text-center shadow-sm border border-slate-100 dark:border-slate-700">
             No appointments found
           </div>
         ) : (
@@ -64,7 +64,7 @@ export default function PatientAppointmentsPage() {
             {appointments.map((appointment) => (
               <div
                 key={appointment.id}
-                className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition"
+                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl p-6 shadow-sm hover:shadow-md transition"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                   <div className="space-y-4">
@@ -74,7 +74,7 @@ export default function PatientAppointmentsPage() {
                       </div>
 
                       <div>
-                        <h2 className="font-bold text-slate-800 text-lg">
+                        <h2 className="font-bold text-slate-800 dark:text-white text-lg">
                           {appointment.complaint}
                         </h2>
 
@@ -107,12 +107,12 @@ export default function PatientAppointmentsPage() {
                     </div>
 
                     {appointment.notes && (
-                      <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
                         <p className="text-xs uppercase font-bold text-slate-400 mb-1">
                           Notes
                         </p>
 
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-slate-600 dark:text-slate-300">
                           {appointment.notes}
                         </p>
                       </div>
@@ -140,13 +140,13 @@ export default function PatientAppointmentsPage() {
 
 function InfoBox({ icon: Icon, label, value }) {
   return (
-    <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+    <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl p-4">
       <div className="flex items-center gap-2 text-slate-400 mb-2">
         <Icon size={15} />
         <span className="text-xs uppercase font-bold">{label}</span>
       </div>
 
-      <p className="text-sm font-semibold text-slate-700">{value}</p>
+      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{value}</p>
     </div>
   );
 }

@@ -40,6 +40,18 @@ const normalizeArray = (data) => {
 };
 
 export default function MedicalRecordsPage() {
+  const role = (localStorage.getItem("role") || "").toLowerCase();
+  const isPatient = role === "patient";
+
+  let user = {};
+  try {
+    user = JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {
+    user = {};
+  }
+
+  const patientId = user?.patientId || user?.id;
+
   const [records, setRecords] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -67,6 +79,23 @@ export default function MedicalRecordsPage() {
     setLoading(true);
 
     try {
+      if (isPatient) {
+        if (!patientId) {
+          showToast("error", "Patient ID not found. Please login again.");
+          setRecords([]);
+          return;
+        }
+
+        const rRes = await api.get(`/medical-records/patient/${patientId}`, {
+          headers: authHeader(),
+        });
+
+        setRecords(normalizeArray(rRes.data));
+        setPatients([]);
+        setDoctors([]);
+        return;
+      }
+
       const [rRes, pRes, dRes] = await Promise.all([
         api.get("/medical-records", { headers: authHeader() }),
         api.get("/patients", { headers: authHeader() }),
@@ -79,7 +108,7 @@ export default function MedicalRecordsPage() {
     } catch (error) {
       showToast(
         "error",
-        error.response?.data?.message || "Failed to load medical records."
+        error.response?.data?.message || "Failed to load medical records.",
       );
     } finally {
       setLoading(false);
@@ -93,8 +122,7 @@ export default function MedicalRecordsPage() {
   const stats = useMemo(() => {
     return {
       records: records.length,
-      patients: new Set(records.map((r) => r.patient?.id).filter(Boolean))
-        .size,
+      patients: new Set(records.map((r) => r.patient?.id).filter(Boolean)).size,
       doctors: new Set(records.map((r) => r.doctor?.id).filter(Boolean)).size,
       prescriptions: records.filter((r) => r.prescription).length,
     };
@@ -112,7 +140,7 @@ export default function MedicalRecordsPage() {
       ]
         .join(" ")
         .toLowerCase()
-        .includes(search.toLowerCase())
+        .includes(search.toLowerCase()),
     );
   }, [records, search]);
 
@@ -149,6 +177,8 @@ export default function MedicalRecordsPage() {
   const handleAdd = async (e) => {
     e.preventDefault();
 
+    if (isPatient) return;
+
     const errorMessage = validateForm();
 
     if (errorMessage) {
@@ -171,7 +201,7 @@ export default function MedicalRecordsPage() {
     } catch (error) {
       showToast(
         "error",
-        error.response?.data?.message || "Failed to create medical record."
+        error.response?.data?.message || "Failed to create medical record.",
       );
     } finally {
       setSaving(false);
@@ -179,6 +209,8 @@ export default function MedicalRecordsPage() {
   };
 
   const openEdit = (record) => {
+    if (isPatient) return;
+
     setSelected(record);
 
     setForm({
@@ -196,6 +228,7 @@ export default function MedicalRecordsPage() {
   const handleEdit = async (e) => {
     e.preventDefault();
 
+    if (isPatient) return;
     if (!selected) return;
 
     const errorMessage = validateForm();
@@ -208,12 +241,16 @@ export default function MedicalRecordsPage() {
     setSaving(true);
 
     try {
-      const res = await api.put(`/medical-records/${selected.id}`, toPayload(), {
-        headers: authHeader(),
-      });
+      const res = await api.put(
+        `/medical-records/${selected.id}`,
+        toPayload(),
+        {
+          headers: authHeader(),
+        },
+      );
 
       setRecords((prev) =>
-        prev.map((record) => (record.id === selected.id ? res.data : record))
+        prev.map((record) => (record.id === selected.id ? res.data : record)),
       );
 
       showToast("success", "Medical record updated.");
@@ -224,7 +261,7 @@ export default function MedicalRecordsPage() {
     } catch (error) {
       showToast(
         "error",
-        error.response?.data?.message || "Failed to update medical record."
+        error.response?.data?.message || "Failed to update medical record.",
       );
     } finally {
       setSaving(false);
@@ -232,11 +269,14 @@ export default function MedicalRecordsPage() {
   };
 
   const openDelete = (record) => {
+    if (isPatient) return;
+
     setSelected(record);
     setDelOpen(true);
   };
 
   const handleDelete = async () => {
+    if (isPatient) return;
     if (!selected) return;
 
     setSaving(true);
@@ -255,7 +295,7 @@ export default function MedicalRecordsPage() {
     } catch (error) {
       showToast(
         "error",
-        error.response?.data?.message || "Failed to delete medical record."
+        error.response?.data?.message || "Failed to delete medical record.",
       );
     } finally {
       setSaving(false);
@@ -312,7 +352,9 @@ export default function MedicalRecordsPage() {
               Medical Records
             </h2>
             <p className="text-xs text-slate-400 dark:text-slate-400">
-              Manage diagnosis, treatment, prescriptions, and doctor notes
+              {isPatient
+                ? "View your diagnosis, treatment, prescriptions, and doctor notes"
+                : "Manage diagnosis, treatment, prescriptions, and doctor notes"}
             </p>
           </div>
 
@@ -325,17 +367,19 @@ export default function MedicalRecordsPage() {
               <RefreshCw size={16} />
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setForm(EMPTY_FORM);
-                setAddOpen(true);
-              }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200 dark:shadow-none"
-            >
-              <Plus size={16} />
-              Add Record
-            </button>
+            {!isPatient && (
+              <button
+                type="button"
+                onClick={() => {
+                  setForm(EMPTY_FORM);
+                  setAddOpen(true);
+                }}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition shadow-sm shadow-blue-200 dark:shadow-none"
+              >
+                <Plus size={16} />
+                Add Record
+              </button>
+            )}
           </div>
         </div>
 
@@ -392,7 +436,11 @@ export default function MedicalRecordsPage() {
                     <td colSpan="7" className="p-12">
                       <EmptyState
                         title="No medical records found"
-                        text="Try adjusting your search or create a new medical record."
+                        text={
+                          isPatient
+                            ? "Your medical records will appear here after a doctor creates them."
+                            : "Try adjusting your search or create a new medical record."
+                        }
                       />
                     </td>
                   </tr>
@@ -436,21 +484,25 @@ export default function MedicalRecordsPage() {
                             <Eye size={15} />
                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() => openEdit(record)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer transition"
-                          >
-                            <Edit2 size={15} />
-                          </button>
+                          {!isPatient && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => openEdit(record)}
+                                className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer transition"
+                              >
+                                <Edit2 size={15} />
+                              </button>
 
-                          <button
-                            type="button"
-                            onClick={() => openDelete(record)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer transition"
-                          >
-                            <Trash2 size={15} />
-                          </button>
+                              <button
+                                type="button"
+                                onClick={() => openDelete(record)}
+                                className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer transition"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -471,39 +523,43 @@ export default function MedicalRecordsPage() {
         </div>
       </div>
 
-      <Drawer
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        title="Add Medical Record"
-        subtitle="Create a new clinical record"
-      >
-        <RecordForm
-          form={form}
-          patients={patients}
-          doctors={doctors}
-          saving={saving}
-          onChange={handleChange}
-          onSubmit={handleAdd}
-          submitLabel="Create Record"
-        />
-      </Drawer>
+      {!isPatient && (
+        <>
+          <Drawer
+            open={addOpen}
+            onClose={() => setAddOpen(false)}
+            title="Add Medical Record"
+            subtitle="Create a new clinical record"
+          >
+            <RecordForm
+              form={form}
+              patients={patients}
+              doctors={doctors}
+              saving={saving}
+              onChange={handleChange}
+              onSubmit={handleAdd}
+              submitLabel="Create Record"
+            />
+          </Drawer>
 
-      <Drawer
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        title="Edit Medical Record"
-        subtitle="Update clinical record information"
-      >
-        <RecordForm
-          form={form}
-          patients={patients}
-          doctors={doctors}
-          saving={saving}
-          onChange={handleChange}
-          onSubmit={handleEdit}
-          submitLabel="Save Changes"
-        />
-      </Drawer>
+          <Drawer
+            open={editOpen}
+            onClose={() => setEditOpen(false)}
+            title="Edit Medical Record"
+            subtitle="Update clinical record information"
+          >
+            <RecordForm
+              form={form}
+              patients={patients}
+              doctors={doctors}
+              saving={saving}
+              onChange={handleChange}
+              onSubmit={handleEdit}
+              submitLabel="Save Changes"
+            />
+          </Drawer>
+        </>
+      )}
 
       <Drawer
         open={viewOpen}
@@ -523,14 +579,16 @@ export default function MedicalRecordsPage() {
         )}
       </Drawer>
 
-      <ConfirmModal
-        open={delOpen}
-        onClose={() => setDelOpen(false)}
-        onConfirm={handleDelete}
-        loading={saving}
-        title="Delete Medical Record"
-        message="Delete this medical record permanently?"
-      />
+      {!isPatient && (
+        <ConfirmModal
+          open={delOpen}
+          onClose={() => setDelOpen(false)}
+          onConfirm={handleDelete}
+          loading={saving}
+          title="Delete Medical Record"
+          message="Delete this medical record permanently?"
+        />
+      )}
     </DashboardLayout>
   );
 }
@@ -713,7 +771,7 @@ function FormSelect({ label, name, value, onChange, children }) {
 function Detail({ label, value }) {
   return (
     <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-3">
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </p>
 
@@ -735,7 +793,9 @@ function Drawer({ open, onClose, title, subtitle, children }) {
             <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
               {title}
             </h2>
-            <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
+              {subtitle}
+            </p>
           </div>
 
           <button

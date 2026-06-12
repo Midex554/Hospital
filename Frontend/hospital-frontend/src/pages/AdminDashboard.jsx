@@ -138,13 +138,13 @@ export default function AdminDashboard() {
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+              <div className="xl:col-span-2 @@@bg-white dark:bg-slate-900@@@ rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    <h3 className="text-xl font-black @@@text-slate-900 dark:text-white@@@">
                       System Overview
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-sm @@@text-slate-500 dark:text-slate-400@@@ mt-1">
                       Hospital activity summary
                     </p>
                   </div>
@@ -177,13 +177,13 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+              <div className="@@@bg-white dark:bg-slate-900@@@ rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    <h3 className="text-xl font-black @@@text-slate-900 dark:text-white@@@">
                       Recent Appointments
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm @@@text-slate-500 dark:text-slate-400@@@">
                       Latest patient bookings
                     </p>
                   </div>
@@ -198,14 +198,14 @@ export default function AdminDashboard() {
                     {recentAppointments.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-700 rounded-2xl p-3"
+                        className="flex items-center justify-between gap-3 @@@bg-slate-50 dark:bg-slate-800@@@/70 border @@@border-slate-100 dark:border-slate-700@@@ rounded-2xl p-3"
                       >
                         <div>
-                          <p className="text-sm font-bold text-slate-800 dark:text-white">
+                          <p className="text-sm font-bold @@@text-slate-800 dark:text-white@@@">
                             {item.patient?.firstName} {item.patient?.lastName}
                           </p>
 
-                          <p className="text-xs text-slate-400 dark:text-slate-500">
+                          <p className="text-xs text-slate-400 dark:text-slate-500 dark:text-slate-400">
                             {item.appointmentDate
                               ? new Date(item.appointmentDate).toLocaleString()
                               : "No date"}
@@ -221,13 +221,13 @@ export default function AdminDashboard() {
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+              <div className="@@@bg-white dark:bg-slate-900@@@ rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    <h3 className="text-xl font-black @@@text-slate-900 dark:text-white@@@">
                       Quick Actions
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm @@@text-slate-500 dark:text-slate-400@@@">
                       Common admin tasks
                     </p>
                   </div>
@@ -241,13 +241,13 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+              <div className="@@@bg-white dark:bg-slate-900@@@ rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    <h3 className="text-xl font-black @@@text-slate-900 dark:text-white@@@">
                       Recent Records
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm @@@text-slate-500 dark:text-slate-400@@@">
                       Latest medical updates
                     </p>
                   </div>
@@ -262,12 +262,12 @@ export default function AdminDashboard() {
                     {recentRecords.map((record) => (
                       <div
                         key={record.id}
-                        className="bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-700 rounded-2xl p-3"
+                        className="@@@bg-slate-50 dark:bg-slate-800@@@/70 border @@@border-slate-100 dark:border-slate-700@@@ rounded-2xl p-3"
                       >
-                        <p className="text-sm font-bold text-slate-800 dark:text-white">
+                        <p className="text-sm font-bold @@@text-slate-800 dark:text-white@@@">
                           {record.diagnosis || "Medical Record"}
                         </p>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                        <p className="text-xs text-slate-400 dark:text-slate-500 dark:text-slate-400 mt-1">
                           {record.createdAt
                             ? new Date(record.createdAt).toLocaleString()
                             : "No date"}
@@ -278,13 +278,13 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
+              <div className="@@@bg-white dark:bg-slate-900@@@ rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    <h3 className="text-xl font-black @@@text-slate-900 dark:text-white@@@">
                       System Status
                     </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm @@@text-slate-500 dark:text-slate-400@@@">
                       HMS health overview
                     </p>
                   </div>
@@ -313,11 +313,11 @@ function StatCard({ icon: Icon, label, value, sub, gradient }) {
       className={`bg-gradient-to-br ${gradient} rounded-3xl p-5 text-white shadow-lg shadow-blue-500/10 hover:scale-[1.02] transition`}
     >
       <div className="flex items-center justify-between mb-5">
-        <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center">
+        <div className="w-11 h-11 rounded-2xl bg-white dark:bg-slate-900/20 flex items-center justify-center">
           <Icon size={22} />
         </div>
 
-        <span className="text-[11px] bg-white/20 px-2 py-1 rounded-full font-bold">
+        <span className="text-[11px] bg-white dark:bg-slate-900/20 px-2 py-1 rounded-full font-bold">
           Live
         </span>
       </div>
@@ -331,11 +331,11 @@ function StatCard({ icon: Icon, label, value, sub, gradient }) {
 
 function QuickAction({ icon: Icon, label }) {
   return (
-    <button className="rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-700 p-4 text-left hover:bg-blue-50 dark:hover:bg-blue-950/30 transition">
+    <button className="rounded-2xl @@@bg-slate-50 dark:bg-slate-800@@@/70 border @@@border-slate-100 dark:border-slate-700@@@ p-4 text-left hover:bg-blue-50 dark:hover:bg-blue-950/30 transition">
       <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-300 flex items-center justify-center mb-3">
         <Icon size={19} />
       </div>
-      <p className="text-sm font-black text-slate-800 dark:text-white">
+      <p className="text-sm font-black @@@text-slate-800 dark:text-white@@@">
         {label}
       </p>
     </button>
@@ -363,8 +363,8 @@ function StatusBadge({ status }) {
 
 function StatusRow({ label, value }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-700 px-4 py-3">
-      <span className="text-sm text-slate-500 dark:text-slate-400 font-semibold">
+    <div className="flex items-center justify-between rounded-2xl @@@bg-slate-50 dark:bg-slate-800@@@/70 border @@@border-slate-100 dark:border-slate-700@@@ px-4 py-3">
+      <span className="text-sm @@@text-slate-500 dark:text-slate-400@@@ font-semibold">
         {label}
       </span>
       <span className="text-sm text-emerald-600 dark:text-emerald-300 font-black">
@@ -376,8 +376,8 @@ function StatusRow({ label, value }) {
 
 function EmptyState({ text }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 p-8 text-center">
-      <p className="text-sm text-slate-500 dark:text-slate-400">{text}</p>
+    <div className="rounded-2xl border border-dashed @@@border-slate-200 dark:border-slate-700@@@ p-8 text-center">
+      <p className="text-sm @@@text-slate-500 dark:text-slate-400@@@">{text}</p>
     </div>
   );
 }

@@ -11,13 +11,14 @@ import "./index.css";
 import DoctorShiftsPage from "./pages/DoctorShiftsPage";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import ReceptionistDashboard from "./pages/ReceptionistDashboard";
+import PatientTestResultsPage from "./pages/PatientTestResultsPage";
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientRegister from "./pages/PatientRegister";
 import BookAppointmentPage from "./pages/BookAppointmentPage";
 import PatientAppointmentsPage from "./pages/PatientAppointmentPage";
 import PharmacyPage from "./pages/PharmacyPage";
 import ChatPage from "./pages/ChatPage";
-
+import DoctorTestResultsPage from "./pages/DoctorTestResultsPage";
 export default function App() {
   return (
     <BrowserRouter>
@@ -98,6 +99,24 @@ export default function App() {
           element={
             <ProtectedRoute>
               <MedicalRecordsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient/test-results"
+          element={
+            <ProtectedRoute allowedRoles={["PATIENT"]}>
+              <PatientTestResultsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/doctor/test-results"
+          element={
+            <ProtectedRoute allowedRoles={["DOCTOR"]}>
+              <DoctorTestResultsPage />
             </ProtectedRoute>
           }
         />

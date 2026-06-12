@@ -201,13 +201,13 @@ export default function DoctorDashboard() {
           <StatCard icon={FileText} label="Completed" value={stats.completed} />
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-2xl font-extrabold text-slate-900">
+              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">
                 Assigned Appointments
               </h2>
-              <p className="text-slate-500 mt-1">
+              <p className="text-slate-500 dark:text-slate-400 mt-1">
                 Patients assigned to Dr. {doctor.firstName} {doctor.lastName}
               </p>
             </div>
@@ -222,11 +222,11 @@ export default function DoctorDashboard() {
           </div>
 
           {loading ? (
-            <p className="text-slate-500">Loading appointments...</p>
+            <p className="text-slate-500 dark:text-slate-400">Loading appointments...</p>
           ) : appointments.length === 0 ? (
-            <div className="border border-dashed border-slate-200 rounded-2xl p-10 text-center">
+            <div className="border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-10 text-center">
               <UserRound className="mx-auto text-slate-300 mb-3" size={36} />
-              <h3 className="font-bold text-slate-700">
+              <h3 className="font-bold text-slate-700 dark:text-slate-200">
                 No assigned appointments
               </h3>
               <p className="text-sm text-slate-400 mt-1">
@@ -238,20 +238,20 @@ export default function DoctorDashboard() {
               {appointments.map((appointment) => (
                 <div
                   key={appointment.id}
-                  className="border border-slate-100 rounded-2xl p-5 hover:shadow-md transition bg-slate-50/40"
+                  className="border border-slate-100 dark:border-slate-700 rounded-2xl p-5 hover:shadow-md transition bg-slate-50 dark:bg-slate-800/40"
                 >
                   <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-5">
                     <div>
-                      <h3 className="text-lg font-extrabold text-slate-800">
+                      <h3 className="text-lg font-extrabold text-slate-800 dark:text-white">
                         {appointment.patient?.firstName}{" "}
                         {appointment.patient?.lastName}
                       </h3>
 
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Complaint: {appointment.complaint}
                       </p>
 
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Date:{" "}
                         {appointment.appointmentDate
                           ? new Date(
@@ -261,7 +261,7 @@ export default function DoctorDashboard() {
                       </p>
 
                       {appointment.notes && (
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                           Notes: {appointment.notes}
                         </p>
                       )}
@@ -318,12 +318,12 @@ export default function DoctorDashboard() {
 
       {recordModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-2xl">
-            <h2 className="text-2xl font-bold mb-2 text-slate-900">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-2xl">
+            <h2 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">
               Create Medical Record
             </h2>
 
-            <p className="text-sm text-slate-500 mb-5">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
               Patient: {selectedAppointment?.patient?.firstName}{" "}
               {selectedAppointment?.patient?.lastName}
             </p>
@@ -335,7 +335,7 @@ export default function DoctorDashboard() {
                 onChange={(e) =>
                   setRecordForm({ ...recordForm, diagnosis: e.target.value })
                 }
-                className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:border-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none focus:border-blue-500"
               />
 
               <textarea
@@ -344,7 +344,7 @@ export default function DoctorDashboard() {
                 onChange={(e) =>
                   setRecordForm({ ...recordForm, treatment: e.target.value })
                 }
-                className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:border-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none focus:border-blue-500"
               />
 
               <textarea
@@ -356,7 +356,7 @@ export default function DoctorDashboard() {
                     prescription: e.target.value,
                   })
                 }
-                className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:border-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none focus:border-blue-500"
               />
 
               <textarea
@@ -365,13 +365,13 @@ export default function DoctorDashboard() {
                 onChange={(e) =>
                   setRecordForm({ ...recordForm, notes: e.target.value })
                 }
-                className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:border-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none focus:border-blue-500"
               />
 
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setRecordModal(false)}
-                  className="px-5 py-2 rounded-xl bg-gray-200 text-slate-700 font-semibold"
+                  className="px-5 py-2 rounded-xl bg-gray-200 text-slate-700 dark:text-slate-200 font-semibold"
                 >
                   Cancel
                 </button>
@@ -390,42 +390,42 @@ export default function DoctorDashboard() {
 
       {recordsModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-2 text-slate-900">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">
               Patient Medical Records
             </h2>
 
-            <p className="text-sm text-slate-500 mb-5">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
               Patient: {selectedAppointment?.patient?.firstName}{" "}
               {selectedAppointment?.patient?.lastName}
             </p>
 
             {medicalRecords.length === 0 ? (
-              <div className="border border-dashed border-slate-200 rounded-2xl p-8 text-center">
+              <div className="border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center">
                 <FileText className="mx-auto text-slate-300 mb-3" size={36} />
-                <p className="text-slate-500">No medical records found.</p>
+                <p className="text-slate-500 dark:text-slate-400">No medical records found.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {medicalRecords.map((record) => (
                   <div
                     key={record.id}
-                    className="border border-slate-200 rounded-2xl p-5 bg-slate-50"
+                    className="border border-slate-200 dark:border-slate-700 rounded-2xl p-5 bg-slate-50 dark:bg-slate-800"
                   >
-                    <p className="text-sm text-slate-700">
+                    <p className="text-sm text-slate-700 dark:text-slate-200">
                       <strong>Diagnosis:</strong> {record.diagnosis || "—"}
                     </p>
 
-                    <p className="text-sm text-slate-700 mt-2">
+                    <p className="text-sm text-slate-700 dark:text-slate-200 mt-2">
                       <strong>Treatment:</strong> {record.treatment || "—"}
                     </p>
 
-                    <p className="text-sm text-slate-700 mt-2">
+                    <p className="text-sm text-slate-700 dark:text-slate-200 mt-2">
                       <strong>Prescription:</strong>{" "}
                       {record.prescription || "—"}
                     </p>
 
-                    <p className="text-sm text-slate-700 mt-2">
+                    <p className="text-sm text-slate-700 dark:text-slate-200 mt-2">
                       <strong>Notes:</strong> {record.notes || "—"}
                     </p>
 
@@ -446,7 +446,7 @@ export default function DoctorDashboard() {
                   setRecordsModal(false);
                   setMedicalRecords([]);
                 }}
-                className="px-5 py-2 rounded-xl bg-gray-200 text-slate-700 font-semibold"
+                className="px-5 py-2 rounded-xl bg-gray-200 text-slate-700 dark:text-slate-200 font-semibold"
               >
                 Close
               </button>
@@ -482,7 +482,7 @@ function StatusBadge({ status }) {
   return (
     <span
       className={`px-4 py-2 rounded-full text-sm font-bold ${
-        styles[status] || "bg-slate-100 text-slate-700"
+        styles[status] || "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
       }`}
     >
       {status || "Pending"}
@@ -504,12 +504,12 @@ function ActionButton({ label, onClick, className, loading }) {
 
 function StatCard({ icon: Icon, label, value }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-5">
       <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
         <Icon size={22} />
       </div>
-      <p className="text-sm text-slate-500">{label}</p>
-      <h3 className="text-3xl font-extrabold text-slate-900 mt-1">{value}</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
+      <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">{value}</h3>
     </div>
   );
 }

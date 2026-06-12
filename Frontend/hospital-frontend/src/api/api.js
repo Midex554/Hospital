@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:
-    "https://assembled-preceding-referring-editorial.trycloudflare.com/api",
+  baseURL: "https://hospital-production-644e.up.railway.app/api",
 });
 
 api.interceptors.request.use((config) => {

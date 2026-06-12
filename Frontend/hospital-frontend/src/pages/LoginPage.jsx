@@ -28,7 +28,7 @@ const avatars = [
 
 function FeatureCard({ icon: Icon, title, text }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md hover:bg-white/[0.08] transition">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md hover:bg-white/10 transition">
       <div className="flex gap-4 items-start">
         <div className="w-11 h-11 rounded-xl bg-blue-600/25 text-cyan-300 flex items-center justify-center shrink-0">
           <Icon size={20} />
@@ -110,7 +110,7 @@ export default function LoginPage() {
         loop
         playsInline
         preload="auto"
-        className="fixed inset-0 h-full w-full object-cover opacity-100"
+        className="fixed inset-0 h-full w-full object-cover"
       >
         <source src={loginBg} type="video/mp4" />
       </video>
@@ -121,22 +121,7 @@ export default function LoginPage() {
       <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:52px_52px]" />
 
       <div className="relative z-10 min-h-screen grid lg:grid-cols-[46%_54%]">
-        <section
-          className="
-    hidden lg:flex
-    relative
-    flex-col
-    justify-between
-    px-14
-    py-12
-    bg-[#010048]
-    border-r
-    border-cyan-500/20
-    overflow-hidden
-    rounded-br-[120px]
-    shadow-[0_0_80px_rgba(0,120,255,0.15)]
-  "
-        >
+        <section className="hidden lg:flex relative flex-col justify-between px-14 py-12 bg-[#010048]/95 border-r border-cyan-500/20 overflow-hidden rounded-br-[120px] shadow-[0_0_80px_rgba(0,120,255,0.15)]">
           <div className="absolute -right-32 bottom-[-80px] w-[350px] h-[350px] rounded-full bg-cyan-500/10 blur-3xl" />
           <div className="absolute top-32 left-40 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
           <div className="absolute top-72 left-72 w-1 h-1 bg-blue-300 rounded-full animate-pulse" />
@@ -199,7 +184,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md p-4 flex items-center justify-between">
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-xl bg-blue-600/25 flex items-center justify-center text-cyan-300 shrink-0">
                   <ShieldCheck size={20} />
@@ -258,7 +243,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="w-full max-w-[420px] rounded-[26px] border border-white/15 bg-white/[0.06] backdrop-blur-md shadow-[0_20px_80px_rgba(0,0,0,0.45)] px-5 sm:px-8 py-6 sm:py-8">
+          <div className="w-full max-w-[420px] rounded-[26px] border border-white/15 bg-white/10 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.45)] px-5 sm:px-8 py-6 sm:py-8">
             <div className="mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/15 border border-white/20 flex items-center justify-center mb-4 shadow-[0_0_40px_rgba(34,211,238,0.25)]">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
                 <Stethoscope size={21} className="text-white" />
@@ -294,7 +279,7 @@ export default function LoginPage() {
                     onChange={handleChange}
                     placeholder="Enter your email"
                     required
-                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/[0.07] pl-11 pr-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
+                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/10 pl-11 pr-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
                   />
                 </div>
               </div>
@@ -317,7 +302,7 @@ export default function LoginPage() {
                     onChange={handleChange}
                     placeholder="Enter your password"
                     required
-                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/[0.07] pl-11 pr-11 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
+                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/10 pl-11 pr-11 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
                   />
 
                   <button
@@ -373,7 +358,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => navigate("/patient-register")}
-                className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/20 bg-white/[0.05] hover:bg-white/[0.1] text-white font-semibold text-sm flex items-center justify-center gap-2 transition"
+                className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-semibold text-sm flex items-center justify-center gap-2 transition"
               >
                 Create Patient Account <UserPlus size={17} />
               </button>

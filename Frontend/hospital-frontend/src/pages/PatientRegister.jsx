@@ -25,7 +25,7 @@ import loginBg from "../assets/videos/286443_medium.mp4";
 
 function FeatureCard({ icon: Icon, title, text }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 backdrop-blur-xl hover:bg-white/[0.09] transition-all duration-200">
+    <div className="rounded-2xl border border-white/10 bg-white dark:bg-slate-900/[0.06] p-5 backdrop-blur-xl hover:bg-white dark:bg-slate-900/[0.09] transition-all duration-200">
       <div className="flex gap-4 items-start">
         <div className="w-11 h-11 rounded-xl bg-blue-600/30 text-cyan-300 flex items-center justify-center shrink-0">
           <Icon size={20} />
@@ -43,7 +43,7 @@ function FeatureCard({ icon: Icon, title, text }) {
 function TrustBadge({ icon: Icon, title, text }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-slate-950/60 border border-white/10 px-5 py-3 backdrop-blur-xl">
-      <div className="w-10 h-10 rounded-xl bg-white/10 text-cyan-300 flex items-center justify-center shrink-0">
+      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/10 text-cyan-300 flex items-center justify-center shrink-0">
         <Icon size={19} />
       </div>
 
@@ -74,7 +74,7 @@ function Input({ icon: Icon, label, name, value, onChange, type = "text" }) {
           value={value}
           onChange={onChange}
           placeholder={`Enter ${label.toLowerCase()}`}
-          className="w-full h-[50px] rounded-xl border border-white/15 bg-white/[0.08] pl-11 pr-4 text-sm text-white placeholder-white/35 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
+          className="w-full h-[50px] rounded-xl border border-white/15 bg-white dark:bg-slate-900/[0.08] pl-11 pr-4 text-sm text-white placeholder-white/35 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
         />
       </div>
     </div>
@@ -294,7 +294,7 @@ export default function PatientRegister() {
               />
             </div>
 
-            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-xl p-4 flex items-center justify-between">
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white dark:bg-slate-900/[0.05] backdrop-blur-xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-xl bg-blue-600/25 flex items-center justify-center text-cyan-300 shrink-0">
                   <ShieldCheck size={20} />
@@ -326,7 +326,7 @@ export default function PatientRegister() {
 
         <section className="min-h-screen flex flex-col items-center justify-center px-5 py-10">
           <div className="w-full max-w-[560px] rounded-[30px] border border-white/15 bg-[#0d1f3c]/60 backdrop-blur-2xl shadow-[0_30px_100px_rgba(0,0,0,0.6)] px-6 sm:px-8 py-8">
-            <div className="mx-auto w-18 h-18 rounded-full bg-white/90 flex items-center justify-center mb-5 shadow-[0_0_50px_rgba(34,211,238,0.35)]">
+            <div className="mx-auto w-18 h-18 rounded-full bg-white dark:bg-slate-900/90 flex items-center justify-center mb-5 shadow-[0_0_50px_rgba(34,211,238,0.35)]">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
                 <UserPlus size={23} className="text-white" />
               </div>
@@ -394,7 +394,7 @@ export default function PatientRegister() {
                     name="gender"
                     value={form.gender}
                     onChange={handleChange}
-                    className="w-full h-[50px] rounded-xl border border-white/15 bg-white/[0.08] px-4 text-sm text-white outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
+                    className="w-full h-[50px] rounded-xl border border-white/15 bg-white dark:bg-slate-900/[0.08] px-4 text-sm text-white outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
                   >
                     <option value="" className="text-black">
                       Select gender
@@ -426,7 +426,7 @@ export default function PatientRegister() {
                     value={form.password}
                     onChange={handleChange}
                     placeholder="Enter password"
-                    className="w-full h-[50px] rounded-xl border border-white/15 bg-white/[0.08] pl-11 pr-11 text-sm text-white placeholder-white/35 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
+                    className="w-full h-[50px] rounded-xl border border-white/15 bg-white dark:bg-slate-900/[0.08] pl-11 pr-11 text-sm text-white placeholder-white/35 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
                   />
 
                   <button
@@ -499,7 +499,7 @@ export default function PatientRegister() {
 
 function MiniFeature({ icon: Icon, text }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1.5 bg-white/[0.07] border border-white/10 rounded-2xl py-3">
+    <div className="flex flex-col items-center justify-center gap-1.5 bg-white dark:bg-slate-900/[0.07] border border-white/10 rounded-2xl py-3">
       <div className="w-8 h-8 rounded-xl bg-cyan-500/20 flex items-center justify-center">
         <Icon size={15} className="text-cyan-300" />
       </div>

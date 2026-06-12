@@ -47,7 +47,7 @@ export default function PatientDashboard() {
               </p>
             </div>
 
-            <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-white dark:bg-slate-900/20 flex items-center justify-center">
               <HeartPulse size={32} />
             </div>
           </div>
@@ -88,10 +88,10 @@ export default function PatientDashboard() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6">
+          <div className="xl:col-span-2 @@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-lg font-extrabold text-slate-800">
+                <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
                   Upcoming Appointments
                 </h2>
                 <p className="text-sm text-slate-400">
@@ -109,10 +109,10 @@ export default function PatientDashboard() {
             />
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6">
+          <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-lg font-extrabold text-slate-800">
+                <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
                   Notifications
                 </h2>
                 <p className="text-sm text-slate-400">
@@ -138,10 +138,10 @@ export default function PatientDashboard() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-lg font-extrabold text-slate-800">
+                <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
                   Prescriptions
                 </h2>
                 <p className="text-sm text-slate-400">
@@ -159,10 +159,10 @@ export default function PatientDashboard() {
             />
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6">
+          <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-lg font-extrabold text-slate-800">
+                <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
                   Patient Profile
                 </h2>
                 <p className="text-sm text-slate-400">
@@ -201,7 +201,7 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
         colors[color] || colors.blue
       } rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
     >
-      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/20 flex items-center justify-center mb-4">
         <Icon size={20} />
       </div>
 
@@ -214,12 +214,12 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
 
 function EmptyBox({ icon: Icon, title, text }) {
   return (
-    <div className="border border-dashed border-slate-200 rounded-2xl p-8 text-center">
+    <div className="border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center">
       <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
         <Icon size={22} />
       </div>
 
-      <h3 className="text-sm font-bold text-slate-700">{title}</h3>
+      <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">{title}</h3>
       <p className="text-xs text-slate-400 mt-1">{text}</p>
     </div>
   );
@@ -227,13 +227,13 @@ function EmptyBox({ icon: Icon, title, text }) {
 
 function NotificationItem({ title, text }) {
   return (
-    <div className="flex gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+    <div className="flex gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
       <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0">
         <Bell size={15} />
       </div>
 
       <div>
-        <p className="text-sm font-bold text-slate-700">{title}</p>
+        <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{title}</p>
         <p className="text-xs text-slate-400 mt-0.5">{text}</p>
       </div>
     </div>
@@ -242,9 +242,9 @@ function NotificationItem({ title, text }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+    <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-800 px-4 py-3">
       <span className="text-slate-400 font-medium">{label}</span>
-      <span className="text-slate-700 font-bold">{value}</span>
+      <span className="text-slate-700 dark:text-slate-200 font-bold">{value}</span>
     </div>
   );
 }

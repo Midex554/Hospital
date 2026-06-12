@@ -209,14 +209,14 @@ export default function ChatPage() {
       {toast && <Toast type={toast.type} message={toast.message} />}
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-5">
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:col-span-1">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-5 lg:col-span-1">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
               <MessageCircle size={22} />
             </div>
 
             <div>
-              <h2 className="font-extrabold text-slate-800">Chat Access</h2>
+              <h2 className="font-extrabold text-slate-800 dark:text-white">Chat Access</h2>
               <p className="text-xs text-slate-400">
                 Approved consultations only
               </p>
@@ -226,20 +226,20 @@ export default function ChatPage() {
           {role === "PATIENT" ? (
             selectedPerson ? (
               <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                <p className="text-xs text-slate-500">Assigned Doctor</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Assigned Doctor</p>
                 <h3 className="font-bold text-blue-700 mt-1">
                   {selectedPerson.name}
                 </h3>
               </div>
             ) : (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 No approved doctor yet. Wait for doctor approval.
               </p>
             )
           ) : (
             <div className="space-y-2">
               {uniqueAppointments.length === 0 ? (
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   No approved patients yet.
                 </p>
               ) : (
@@ -265,7 +265,7 @@ export default function ChatPage() {
                       className={`w-full text-left p-3 rounded-2xl border transition ${
                         active
                           ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-slate-700 border-slate-100 hover:bg-blue-50"
+                          : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-100 dark:border-slate-700 hover:bg-blue-50"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-3">
@@ -273,7 +273,7 @@ export default function ChatPage() {
                           <div
                             className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${
                               active
-                                ? "bg-white/20 text-white"
+                                ? "bg-white dark:bg-slate-900/20 text-white"
                                 : "bg-blue-100 text-blue-600"
                             }`}
                           >
@@ -321,10 +321,10 @@ export default function ChatPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden lg:col-span-3">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden lg:col-span-3">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-extrabold text-slate-800">
+              <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
                 {selectedPerson
                   ? `Chat with ${selectedPerson.name}`
                   : "Consultation Chat"}
@@ -344,14 +344,14 @@ export default function ChatPage() {
             </button>
           </div>
 
-          <div className="h-[500px] overflow-y-auto p-5 space-y-3 bg-slate-50">
+          <div className="h-[500px] overflow-y-auto p-5 space-y-3 bg-slate-50 dark:bg-slate-800">
             {!selectedPerson ? (
               <EmptyChat
                 title="No chat selected"
                 text="Chat becomes available after doctor approval."
               />
             ) : loading ? (
-              <p className="text-center text-slate-500">Loading chat...</p>
+              <p className="text-center text-slate-500 dark:text-slate-400">Loading chat...</p>
             ) : messages.length === 0 ? (
               <EmptyChat
                 title="No messages yet"
@@ -372,7 +372,7 @@ export default function ChatPage() {
                       className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${
                         mine
                           ? "bg-blue-600 text-white rounded-br-sm"
-                          : "bg-white text-slate-700 border border-slate-100 rounded-bl-sm"
+                          : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-bl-sm"
                       }`}
                     >
                       <p className="text-sm leading-relaxed">{msg.message}</p>
@@ -393,7 +393,7 @@ export default function ChatPage() {
             )}
           </div>
 
-          <div className="p-4 border-t border-slate-100 bg-white">
+          <div className="p-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900">
             <div className="flex gap-3">
               <input
                 value={message}
@@ -407,7 +407,7 @@ export default function ChatPage() {
                     ? "Type message..."
                     : "Chat is available after approval"
                 }
-                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 disabled:bg-slate-100"
+                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm outline-none focus:border-blue-500 disabled:bg-slate-100 dark:bg-slate-800"
               />
 
               <button
@@ -430,7 +430,7 @@ function EmptyChat({ title, text }) {
   return (
     <div className="h-full flex flex-col items-center justify-center text-center">
       <MessageCircle className="text-slate-300 mb-3" size={42} />
-      <h3 className="font-bold text-slate-700">{title}</h3>
+      <h3 className="font-bold text-slate-700 dark:text-slate-200">{title}</h3>
       <p className="text-sm text-slate-400 mt-1">{text}</p>
     </div>
   );

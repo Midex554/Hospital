@@ -271,9 +271,9 @@ export default function DoctorShiftsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 @@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm px-5 py-4">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
+            <h2 className="text-lg font-extrabold @@@text-slate-800 dark:text-white@@@">
               Doctor Shifts
             </h2>
             <p className="text-xs text-slate-400">
@@ -284,7 +284,7 @@ export default function DoctorShiftsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={fetchAll}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 cursor-pointer"
+              className="p-2 rounded-xl @@@hover:bg-slate-100 dark:hover:bg-slate-800@@@ text-slate-500 dark:text-slate-300 cursor-pointer"
             >
               <RefreshCw size={16} />
             </button>
@@ -312,15 +312,15 @@ export default function DoctorShiftsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by doctor, specialization, date, time, status..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm"
+            className="w-full pl-10 pr-4 py-3 rounded-xl @@@bg-white dark:bg-slate-900@@@ border @@@border-slate-200 dark:border-slate-700@@@ @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm"
           />
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[1000px]">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+                <tr className="@@@bg-slate-50 dark:bg-slate-800@@@ border-b @@@border-slate-100 dark:border-slate-700@@@">
                   {[
                     "#",
                     "Doctor",
@@ -361,29 +361,29 @@ export default function DoctorShiftsPage() {
                   filtered.map((shift, index) => (
                     <tr
                       key={shift.id}
-                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition-all duration-200"
+                      className="border-b @@@border-slate-50 dark:border-slate-800@@@ hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition-all duration-200"
                     >
-                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 font-mono text-xs">
+                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 dark:text-slate-400 font-mono text-xs">
                         {index + 1}
                       </td>
 
-                      <td className="px-4 py-3 font-semibold text-slate-800 dark:text-white">
+                      <td className="px-4 py-3 font-semibold @@@text-slate-800 dark:text-white@@@">
                         Dr. {fullName(shift.doctor) || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
                         {shift.doctor?.specialization || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
                         {shift.shiftDate || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
                         {shift.startTime || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
                         {shift.endTime || "—"}
                       </td>
 
@@ -395,14 +395,14 @@ export default function DoctorShiftsPage() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openEdit(shift)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-green-100 dark:hover:bg-green-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-green-600 dark:hover:text-green-300 cursor-pointer"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
                             onClick={() => openDelete(shift)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-red-100 dark:hover:bg-red-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-red-600 dark:hover:text-red-300 cursor-pointer"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -416,7 +416,7 @@ export default function DoctorShiftsPage() {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400 flex justify-between">
+            <div className="px-4 py-3 border-t @@@border-slate-100 dark:border-slate-700@@@ text-xs text-slate-400 flex justify-between">
               <span>
                 Showing {filtered.length} of {shifts.length} doctor shifts
               </span>
@@ -570,7 +570,7 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
     <div
       className={`bg-gradient-to-br ${colors[color] || colors.blue} rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
     >
-      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/20 flex items-center justify-center mb-4">
         <Icon size={20} />
       </div>
       <p className="text-sm text-white/80">{label}</p>
@@ -625,7 +625,7 @@ function FormInput({ label, name, value, onChange, type = "text" }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       />
     </div>
   );
@@ -642,7 +642,7 @@ function FormSelect({ label, name, value, onChange, children }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       >
         {children}
       </select>
@@ -655,10 +655,10 @@ function Drawer({ open, onClose, title, subtitle, children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
-      <div className="h-full w-full max-w-xl bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-2xl overflow-y-auto animate-slideIn">
-        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+      <div className="h-full w-full max-w-xl @@@bg-white dark:bg-slate-900@@@ border-l @@@border-slate-200 dark:border-slate-700@@@ shadow-2xl overflow-y-auto animate-slideIn">
+        <div className="sticky top-0 @@@bg-white dark:bg-slate-900@@@ border-b @@@border-slate-100 dark:border-slate-700@@@ px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+            <h2 className="text-xl font-extrabold @@@text-slate-800 dark:text-white@@@">
               {title}
             </h2>
             <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
@@ -683,12 +683,12 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border border-slate-100 dark:border-slate-700">
+      <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border @@@border-slate-100 dark:border-slate-700@@@">
         <h2 className="text-xl font-extrabold text-red-600 dark:text-red-400 mb-3">
           {title}
         </h2>
 
-        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+        <p className="text-sm @@@text-slate-600 dark:text-slate-300@@@ mb-6">
           {message}
         </p>
 
@@ -696,7 +696,7 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 @@@text-slate-700 dark:text-slate-200@@@"
           >
             Cancel
           </button>

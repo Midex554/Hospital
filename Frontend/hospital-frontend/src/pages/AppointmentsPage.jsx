@@ -293,9 +293,9 @@ export default function AppointmentsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 @@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm px-5 py-4">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-800">
+            <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
               Appointments
             </h2>
             <p className="text-xs text-slate-400">
@@ -306,7 +306,7 @@ export default function AppointmentsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={fetchAll}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition cursor-pointer"
+              className="p-2 rounded-xl hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition cursor-pointer"
             >
               <RefreshCw size={16} />
             </button>
@@ -335,14 +335,14 @@ export default function AppointmentsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by patient, doctor, date, status..."
-              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-sm outline-none"
+              className="w-full pl-10 pr-4 py-3 rounded-xl @@@bg-white dark:bg-slate-900@@@ border @@@border-slate-200 dark:border-slate-700@@@ @@@text-slate-800 dark:text-white@@@ text-sm outline-none"
             />
           </div>
 
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
+            className="w-full px-4 py-3 rounded-xl @@@bg-white dark:bg-slate-900@@@ border @@@border-slate-200 dark:border-slate-700@@@ @@@text-slate-800 dark:text-white@@@"
           >
             <option value="all">All Status</option>
             {STATUSES.map((s) => (
@@ -353,11 +353,11 @@ export default function AppointmentsPage() {
           </select>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[1000px]">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 dark:bg-slate-800 dark:border-slate-600">
+                <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:bg-slate-800 dark:border-slate-600">
                   {[
                     "#",
                     "Patient",
@@ -369,7 +369,7 @@ export default function AppointmentsPage() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap"
+                      className="text-left px-4 py-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap"
                     >
                       {h}
                     </th>
@@ -380,7 +380,7 @@ export default function AppointmentsPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="p-10 text-center text-slate-500">
+                    <td colSpan="7" className="p-10 text-center text-slate-500 dark:text-slate-400">
                       Loading appointments...
                     </td>
                   </tr>
@@ -397,21 +397,21 @@ export default function AppointmentsPage() {
                   filtered.map((a, i) => (
                     <tr
                       key={a.id}
-                      className="border-b border-slate-50 hover:bg-blue-50/40 hover:scale-[1.002] transition-all duration-200"
+                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 hover:scale-[1.002] transition-all duration-200"
                     >
                       <td className="px-4 py-3 text-slate-400 font-mono text-xs">
                         {i + 1}
                       </td>
 
-                      <td className="px-4 py-3 font-semibold text-slate-800">
+                      <td className="px-4 py-3 font-semibold text-slate-800 dark:text-white">
                         {fullName(a.patient) || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {fullName(a.doctor) || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                         {a.appointmentDate || "—"}
                       </td>
 
@@ -419,7 +419,7 @@ export default function AppointmentsPage() {
                         <StatusBadge status={a.status} />
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 max-w-[220px] truncate">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[220px] truncate">
                         {a.notes || "—"}
                       </td>
 
@@ -427,21 +427,21 @@ export default function AppointmentsPage() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <button
                             onClick={() => openView(a)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-600 cursor-pointer"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 text-slate-600 dark:text-slate-300 hover:text-blue-600 cursor-pointer"
                           >
                             <Eye size={15} />
                           </button>
 
                           <button
                             onClick={() => openEdit(a)}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-green-100 text-slate-600 hover:text-green-600 cursor-pointer"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 text-slate-600 dark:text-slate-300 hover:text-green-600 cursor-pointer"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
                             onClick={() => handleStatusUpdate(a, "Completed")}
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-yellow-100 text-slate-600 hover:text-yellow-600 cursor-pointer"
+                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-yellow-100 text-slate-600 dark:text-slate-300 hover:text-yellow-600 cursor-pointer"
                           >
                             <CheckSquare size={15} />
                           </button>
@@ -462,7 +462,7 @@ export default function AppointmentsPage() {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 text-xs text-slate-400 flex justify-between">
+            <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400 flex justify-between">
               <span>
                 Showing {filtered.length} of {appointments.length} appointments
               </span>
@@ -626,7 +626,7 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
         colors[color] || colors.blue
       } rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
     >
-      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/20 flex items-center justify-center mb-4">
         <Icon size={20} />
       </div>
 
@@ -664,7 +664,7 @@ function EmptyState({ title, text }) {
       <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
         <CalendarDays size={22} />
       </div>
-      <h3 className="text-sm font-bold text-slate-700">{title}</h3>
+      <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">{title}</h3>
       <p className="text-xs text-slate-400 mt-1">{text}</p>
     </div>
   );
@@ -673,7 +673,7 @@ function EmptyState({ title, text }) {
 function FormInput({ label, name, value, onChange, type = "text" }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </label>
 
@@ -682,7 +682,7 @@ function FormInput({ label, name, value, onChange, type = "text" }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       />
     </div>
   );
@@ -691,7 +691,7 @@ function FormInput({ label, name, value, onChange, type = "text" }) {
 function FormTextarea({ label, name, value, onChange, placeholder }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </label>
 
@@ -701,7 +701,7 @@ function FormTextarea({ label, name, value, onChange, placeholder }) {
         onChange={onChange}
         placeholder={placeholder}
         rows={4}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none"
       />
     </div>
   );
@@ -710,7 +710,7 @@ function FormTextarea({ label, name, value, onChange, placeholder }) {
 function FormSelect({ label, name, value, onChange, children }) {
   return (
     <div>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </label>
 
@@ -718,7 +718,7 @@ function FormSelect({ label, name, value, onChange, children }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 bg-white"
+        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 bg-white dark:bg-slate-900"
       >
         {children}
       </select>
@@ -728,11 +728,11 @@ function FormSelect({ label, name, value, onChange, children }) {
 
 function Detail({ label, value }) {
   return (
-    <div className="bg-slate-50 rounded-xl px-3 py-3">
+    <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-3">
       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
         {label}
       </p>
-      <p className="text-slate-700 font-medium mt-1">{value || "—"}</p>
+      <p className="text-slate-700 dark:text-slate-200 font-medium mt-1">{value || "—"}</p>
     </div>
   );
 }
@@ -742,10 +742,10 @@ function Drawer({ open, onClose, title, subtitle, children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/20 backdrop-blur-sm">
-      <div className="h-full w-full max-w-xl bg-white shadow-2xl overflow-y-auto animate-slideIn">
-        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10">
+      <div className="h-full w-full max-w-xl bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto animate-slideIn">
+        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800">{title}</h2>
+            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">{title}</h2>
             <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
           </div>
 

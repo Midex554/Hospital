@@ -27,13 +27,20 @@ const EMPTY_FORM = {
   email: "",
   address: "",
   bloodGroup: "",
+  dateOfBirth: "",
+  genotype: "",
+  emergencyContactName: "",
+  emergencyContactPhone: "",
+  allergies: "",
+  medicalHistory: "",
+  profileImageUrl: "",
 };
 
-function PatientsPage() {
+export default function PatientsPage() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [alert, setAlert] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -43,8 +50,6 @@ function PatientsPage() {
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
-
-  const [toast, setToast] = useState(null);
 
   const showToast = (type, message) => {
     setToast({ type, message });
@@ -64,10 +69,10 @@ function PatientsPage() {
 
       setPatients(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
-      setAlert({
-        type: "error",
-        message: error.response?.data?.message || "Failed to load patients.",
-      });
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to load patients.",
+      );
     } finally {
       setLoading(false);
     }
@@ -98,7 +103,19 @@ function PatientsPage() {
 
   const filtered = useMemo(() => {
     return patients.filter((p) =>
-      [p.firstName, p.lastName, p.email, p.phone, p.bloodGroup, p.gender]
+      [
+        p.firstName,
+        p.lastName,
+        p.email,
+        p.phone,
+        p.bloodGroup,
+        p.gender,
+        p.genotype,
+        p.emergencyContactName,
+        p.emergencyContactPhone,
+        p.allergies,
+        p.medicalHistory,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(search.toLowerCase()),
@@ -126,7 +143,10 @@ function PatientsPage() {
       setAddOpen(false);
       setForm(EMPTY_FORM);
     } catch (error) {
-      showToast("error", "Failed to add patient.");
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to add patient.",
+      );
     } finally {
       setSaving(false);
     }
@@ -143,6 +163,13 @@ function PatientsPage() {
       email: patient.email || "",
       address: patient.address || "",
       bloodGroup: patient.bloodGroup || "",
+      dateOfBirth: patient.dateOfBirth || "",
+      genotype: patient.genotype || "",
+      emergencyContactName: patient.emergencyContactName || "",
+      emergencyContactPhone: patient.emergencyContactPhone || "",
+      allergies: patient.allergies || "",
+      medicalHistory: patient.medicalHistory || "",
+      profileImageUrl: patient.profileImageUrl || "",
     });
 
     setEditOpen(true);
@@ -162,10 +189,15 @@ function PatientsPage() {
         prev.map((p) => (p.id === selected.id ? res.data : p)),
       );
 
+      showToast("success", "Patient updated successfully.");
       setEditOpen(false);
       setSelected(null);
+      setForm(EMPTY_FORM);
     } catch (error) {
-      showToast("error", "Failed to update patient.");
+      showToast(
+        "error",
+        error.response?.data?.message || "Failed to update patient.",
+      );
     } finally {
       setSaving(false);
     }
@@ -187,13 +219,15 @@ function PatientsPage() {
       });
 
       setPatients((prev) => prev.filter((p) => p.id !== selected.id));
-
       showToast("success", "Patient deleted successfully.");
 
       setDelOpen(false);
       setSelected(null);
     } catch (error) {
-      showToast("error", "Patient could not be deleted.");
+      showToast(
+        "error",
+        error.response?.data?.message || "Patient could not be deleted.",
+      );
     } finally {
       setSaving(false);
     }
@@ -243,9 +277,9 @@ function PatientsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 @@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm px-5 py-4">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-800 dark:text-white">
+            <h2 className="text-lg font-extrabold @@@text-slate-800 dark:text-white@@@">
               Patients
             </h2>
             <p className="text-xs text-slate-400 dark:text-slate-400">
@@ -256,7 +290,7 @@ function PatientsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={fetchPatients}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 transition cursor-pointer"
+              className="p-2 rounded-xl @@@hover:bg-slate-100 dark:hover:bg-slate-800@@@ text-slate-500 dark:text-slate-300 transition cursor-pointer"
             >
               <RefreshCw size={16} />
             </button>
@@ -284,15 +318,15 @@ function PatientsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, email, phone, blood group..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition placeholder:text-slate-400"
+            className="w-full pl-10 pr-4 py-3 rounded-xl @@@bg-white dark:bg-slate-900@@@ border @@@border-slate-200 dark:border-slate-700@@@ text-sm text-slate-700 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl border @@@border-slate-100 dark:border-slate-700@@@ shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[900px]">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+                <tr className="@@@bg-slate-50 dark:bg-slate-800@@@ border-b @@@border-slate-100 dark:border-slate-700@@@">
                   {[
                     "#",
                     "Patient",
@@ -335,20 +369,18 @@ function PatientsPage() {
                   filtered.map((patient, index) => (
                     <tr
                       key={patient.id}
-                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition-all duration-200 group"
+                      className="border-b @@@border-slate-50 dark:border-slate-800@@@ hover:bg-blue-50/40 dark:hover:bg-slate-800/70 transition-all duration-200 group"
                     >
-                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 font-mono text-xs">
+                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 dark:text-slate-400 font-mono text-xs">
                         {index + 1}
                       </td>
 
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-xs">
-                            {(patient.firstName || "?").charAt(0)}
-                          </div>
+                          <Avatar patient={patient} />
 
                           <div>
-                            <p className="font-semibold text-slate-800 dark:text-white">
+                            <p className="font-semibold @@@text-slate-800 dark:text-white@@@">
                               {fullName(patient) || "—"}
                             </p>
                             <p className="text-[11px] text-slate-400 dark:text-slate-400">
@@ -362,7 +394,7 @@ function PatientsPage() {
                         <GenderBadge gender={patient.gender} />
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
                         {patient.phone || "—"}
                       </td>
 
@@ -376,7 +408,7 @@ function PatientsPage() {
                         )}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[280px] truncate">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@ max-w-[280px] truncate">
                         {patient.address || "—"}
                       </td>
 
@@ -384,21 +416,21 @@ function PatientsPage() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openView(patient)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-950/40 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-blue-100 dark:hover:bg-blue-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer transition"
                           >
                             <User size={15} />
                           </button>
 
                           <button
                             onClick={() => openEdit(patient)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer transition"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-green-100 dark:hover:bg-green-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-green-600 dark:hover:text-green-300 cursor-pointer transition"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
                             onClick={() => openDelete(patient)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer transition"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-red-100 dark:hover:bg-red-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-red-600 dark:hover:text-red-300 cursor-pointer transition"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -412,7 +444,7 @@ function PatientsPage() {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400 dark:text-slate-400 flex justify-between">
+            <div className="px-4 py-3 border-t @@@border-slate-100 dark:border-slate-700@@@ text-xs text-slate-400 dark:text-slate-400 flex justify-between">
               <span>
                 Showing {filtered.length} of {patients.length} patients
               </span>
@@ -460,13 +492,11 @@ function PatientsPage() {
       >
         {selected && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-700">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white text-2xl font-extrabold">
-                {(selected.firstName || "?").charAt(0)}
-              </div>
+            <div className="flex items-center gap-4 pb-4 border-b @@@border-slate-100 dark:border-slate-700@@@">
+              <Avatar patient={selected} large />
 
               <div>
-                <p className="text-lg font-extrabold text-slate-800 dark:text-white">
+                <p className="text-lg font-extrabold @@@text-slate-800 dark:text-white@@@">
                   {fullName(selected)}
                 </p>
                 <p className="text-sm text-slate-400 dark:text-slate-400">
@@ -475,11 +505,27 @@ function PatientsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <Detail label="Gender" value={selected.gender} />
               <Detail label="Phone" value={selected.phone} />
               <Detail label="Blood Group" value={selected.bloodGroup} />
+              <Detail label="Genotype" value={selected.genotype} />
+              <Detail label="Date of Birth" value={selected.dateOfBirth} />
               <Detail label="Address" value={selected.address} />
+              <Detail
+                label="Emergency Contact"
+                value={selected.emergencyContactName}
+              />
+              <Detail
+                label="Emergency Phone"
+                value={selected.emergencyContactPhone}
+              />
+              <Detail label="Allergies" value={selected.allergies} full />
+              <Detail
+                label="Medical History"
+                value={selected.medicalHistory}
+                full
+              />
             </div>
           </div>
         )}
@@ -542,6 +588,28 @@ function PatientForm({ form, handleChange, onSubmit, submitLabel, saving }) {
           ))}
         </FormSelect>
 
+        <FormSelect
+          label="Genotype"
+          name="genotype"
+          value={form.genotype}
+          onChange={handleChange}
+        >
+          <option value="">Select Genotype</option>
+          {["AA", "AS", "SS", "AC", "SC"].map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+        </FormSelect>
+
+        <FormInput
+          label="Date of Birth"
+          name="dateOfBirth"
+          value={form.dateOfBirth}
+          onChange={handleChange}
+          type="date"
+        />
+
         <FormInput
           label="Phone"
           name="phone"
@@ -566,6 +634,46 @@ function PatientForm({ form, handleChange, onSubmit, submitLabel, saving }) {
           onChange={handleChange}
           placeholder="Address"
         />
+
+        <FormInput
+          label="Emergency Contact Name"
+          name="emergencyContactName"
+          value={form.emergencyContactName}
+          onChange={handleChange}
+          placeholder="Emergency contact name"
+        />
+
+        <FormInput
+          label="Emergency Contact Phone"
+          name="emergencyContactPhone"
+          value={form.emergencyContactPhone}
+          onChange={handleChange}
+          placeholder="Emergency contact phone"
+        />
+
+        <FormInput
+          label="Profile Image URL"
+          name="profileImageUrl"
+          value={form.profileImageUrl}
+          onChange={handleChange}
+          placeholder="https://..."
+        />
+
+        <FormTextarea
+          label="Allergies"
+          name="allergies"
+          value={form.allergies}
+          onChange={handleChange}
+          placeholder="Example: Penicillin, peanuts..."
+        />
+
+        <FormTextarea
+          label="Medical History"
+          name="medicalHistory"
+          value={form.medicalHistory}
+          onChange={handleChange}
+          placeholder="Previous conditions, surgeries, long-term illness..."
+        />
       </div>
 
       <button
@@ -575,6 +683,30 @@ function PatientForm({ form, handleChange, onSubmit, submitLabel, saving }) {
       >
         {saving ? "Saving..." : submitLabel}
       </button>
+    </div>
+  );
+}
+
+function Avatar({ patient, large = false }) {
+  const size = large
+    ? "w-14 h-14 text-2xl rounded-2xl"
+    : "w-9 h-9 text-xs rounded-full";
+
+  if (patient?.profileImageUrl) {
+    return (
+      <img
+        src={patient.profileImageUrl}
+        alt="Patient"
+        className={`${size} object-cover border @@@border-slate-200 dark:border-slate-700@@@`}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`${size} bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold`}
+    >
+      {(patient?.firstName || "?").charAt(0)}
     </div>
   );
 }
@@ -593,7 +725,7 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
         colors[color] || colors.blue
       } rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
     >
-      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/20 flex items-center justify-center mb-4">
         <Icon size={20} />
       </div>
 
@@ -623,7 +755,7 @@ function GenderBadge({ gender }) {
     );
   }
 
-  return <span className="text-slate-400 dark:text-slate-500">—</span>;
+  return <span className="text-slate-400 dark:text-slate-500 dark:text-slate-400">—</span>;
 }
 
 function EmptyState({ title, text }) {
@@ -660,7 +792,26 @@ function FormInput({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 placeholder:text-slate-400"
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+      />
+    </div>
+  );
+}
+
+function FormTextarea({ label, name, value, onChange, placeholder }) {
+  return (
+    <div>
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
+        {label}
+      </label>
+
+      <textarea
+        name={name}
+        value={value}
+        onChange={onChange}
+        rows={4}
+        placeholder={placeholder}
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
       />
     </div>
   );
@@ -677,7 +828,7 @@ function FormSelect({ label, name, value, onChange, children }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       >
         {children}
       </select>
@@ -685,13 +836,17 @@ function FormSelect({ label, name, value, onChange, children }) {
   );
 }
 
-function Detail({ label, value }) {
+function Detail({ label, value, full = false }) {
   return (
-    <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-3">
+    <div
+      className={`@@@bg-slate-50 dark:bg-slate-800@@@ rounded-xl px-3 py-3 ${
+        full ? "sm:col-span-2" : ""
+      }`}
+    >
       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </p>
-      <p className="text-slate-700 dark:text-white font-medium mt-1">
+      <p className="text-slate-700 dark:text-white font-medium mt-1 whitespace-pre-wrap">
         {value || "—"}
       </p>
     </div>
@@ -703,10 +858,10 @@ function Drawer({ open, onClose, title, subtitle, children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
-      <div className="h-full w-full max-w-xl bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto animate-slideIn border-l border-slate-200 dark:border-slate-700">
-        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+      <div className="h-full w-full max-w-xl @@@bg-white dark:bg-slate-900@@@ shadow-2xl overflow-y-auto animate-slideIn border-l @@@border-slate-200 dark:border-slate-700@@@">
+        <div className="sticky top-0 @@@bg-white dark:bg-slate-900@@@ border-b @@@border-slate-100 dark:border-slate-700@@@ px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+            <h2 className="text-xl font-extrabold @@@text-slate-800 dark:text-white@@@">
               {title}
             </h2>
             <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
@@ -733,19 +888,19 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border border-slate-100 dark:border-slate-700">
+      <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border @@@border-slate-100 dark:border-slate-700@@@">
         <h2 className="text-xl font-extrabold text-red-600 dark:text-red-400 mb-3">
           {title}
         </h2>
 
-        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+        <p className="text-sm @@@text-slate-600 dark:text-slate-300@@@ mb-6">
           {message}
         </p>
 
         <div className="flex justify-center gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer transition"
+            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 @@@text-slate-700 dark:text-slate-200@@@ cursor-pointer transition"
           >
             Cancel
           </button>
@@ -775,5 +930,3 @@ function Toast({ type, message }) {
     </div>
   );
 }
-
-export default PatientsPage;

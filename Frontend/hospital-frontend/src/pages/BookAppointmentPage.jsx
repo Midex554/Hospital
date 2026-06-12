@@ -60,12 +60,12 @@ export default function BookAppointmentPage() {
   return (
     <DashboardLayout title="Book Appointment">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h1 className="text-2xl font-extrabold text-slate-800 mb-2">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
+          <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white mb-2">
             Book Appointment
           </h1>
 
-          <p className="text-slate-500 mb-6">
+          <p className="text-slate-500 dark:text-slate-400 mb-6">
             Submit your complaint and get assigned to an available doctor.
           </p>
 
@@ -81,7 +81,7 @@ export default function BookAppointmentPage() {
                 value={form.appointmentDate}
                 onChange={handleChange}
                 required
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
               />
             </div>
 
@@ -97,7 +97,7 @@ export default function BookAppointmentPage() {
                 onChange={handleChange}
                 placeholder="Enter your complaint"
                 required
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
               />
             </div>
 
@@ -110,7 +110,7 @@ export default function BookAppointmentPage() {
                 onChange={handleChange}
                 rows="4"
                 placeholder="Additional notes..."
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
               />
             </div>
 

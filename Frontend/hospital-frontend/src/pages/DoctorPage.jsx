@@ -12,6 +12,8 @@ import {
   Mail,
   Phone,
   UserRound,
+  Award,
+  BriefcaseMedical,
 } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
 
@@ -24,7 +26,17 @@ const EMPTY_FORM = {
   lastName: "",
   email: "",
   phone: "",
+  gender: "",
   specialization: "",
+  qualification: "",
+  experienceYears: "",
+  licenseNumber: "",
+  officeLocation: "",
+  availability: "",
+  profileImageUrl: "",
+  bio: "",
+  achievements: "",
+  certifications: "",
 };
 
 const SPECIALIZATIONS = [
@@ -95,7 +107,8 @@ export default function DoctorsPage() {
       total: doctors.length,
       specializations,
       withEmail: doctors.filter((d) => d.email).length,
-      withPhone: doctors.filter((d) => d.phone).length,
+      experienced: doctors.filter((d) => Number(d.experienceYears || 0) > 0)
+        .length,
     };
   }, [doctors]);
 
@@ -106,7 +119,15 @@ export default function DoctorsPage() {
         doctor.lastName,
         doctor.email,
         doctor.phone,
+        doctor.gender,
         doctor.specialization,
+        doctor.qualification,
+        doctor.licenseNumber,
+        doctor.officeLocation,
+        doctor.availability,
+        doctor.bio,
+        doctor.achievements,
+        doctor.certifications,
       ]
         .join(" ")
         .toLowerCase()
@@ -129,6 +150,12 @@ export default function DoctorsPage() {
     return null;
   };
 
+  const toPayload = () => ({
+    ...form,
+    experienceYears:
+      form.experienceYears === "" ? null : Number(form.experienceYears),
+  });
+
   const handleAdd = async () => {
     const errorMessage = validateForm();
 
@@ -140,7 +167,7 @@ export default function DoctorsPage() {
     setSaving(true);
 
     try {
-      const res = await api.post("/doctors", form, {
+      const res = await api.post("/doctors", toPayload(), {
         headers: authHeader(),
       });
 
@@ -167,7 +194,17 @@ export default function DoctorsPage() {
       lastName: doctor.lastName || "",
       email: doctor.email || "",
       phone: doctor.phone || "",
+      gender: doctor.gender || "",
       specialization: doctor.specialization || "",
+      qualification: doctor.qualification || "",
+      experienceYears: doctor.experienceYears ?? "",
+      licenseNumber: doctor.licenseNumber || "",
+      officeLocation: doctor.officeLocation || "",
+      availability: doctor.availability || "",
+      profileImageUrl: doctor.profileImageUrl || "",
+      bio: doctor.bio || "",
+      achievements: doctor.achievements || "",
+      certifications: doctor.certifications || "",
     });
 
     setEditOpen(true);
@@ -186,7 +223,7 @@ export default function DoctorsPage() {
     setSaving(true);
 
     try {
-      const res = await api.put(`/doctors/${selected.id}`, form, {
+      const res = await api.put(`/doctors/${selected.id}`, toPayload(), {
         headers: authHeader(),
       });
 
@@ -276,29 +313,30 @@ export default function DoctorsPage() {
           />
 
           <StatCard
-            icon={Phone}
-            label="With Phone"
-            value={stats.withPhone}
-            sub="Reachable by phone"
+            icon={Award}
+            label="Experienced"
+            value={stats.experienced}
+            sub="Profile completed"
             color="cyan"
           />
         </div>
 
-        <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 @@@bg-white dark:bg-slate-900@@@ border @@@border-slate-100 dark:border-slate-700@@@ rounded-2xl p-5 shadow-sm">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+            <h2 className="text-xl font-extrabold @@@text-slate-800 dark:text-white@@@">
               Doctors
             </h2>
 
             <p className="text-sm text-slate-400 dark:text-slate-400 mt-1">
-              Manage doctors and specializations
+              Manage doctors, specializations, qualifications, and professional
+              profiles
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={fetchDoctors}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 cursor-pointer"
+              className="p-2 rounded-xl @@@hover:bg-slate-100 dark:hover:bg-slate-800@@@ text-slate-500 dark:text-slate-300 cursor-pointer"
             >
               <RefreshCw size={16} />
             </button>
@@ -325,23 +363,23 @@ export default function DoctorsPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search doctors..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm placeholder:text-slate-400"
+            placeholder="Search doctors by name, specialization, qualification, license..."
+            className="w-full pl-10 pr-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ @@@bg-white dark:bg-slate-900@@@ @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
+        <div className="@@@bg-white dark:bg-slate-900@@@ border @@@border-slate-100 dark:border-slate-700@@@ rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[900px]">
+            <table className="w-full text-sm min-w-[1000px]">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+                <tr className="@@@bg-slate-50 dark:bg-slate-800@@@ border-b @@@border-slate-100 dark:border-slate-700@@@">
                   {[
                     "#",
                     "Doctor",
                     "Email",
                     "Phone",
                     "Specialization",
-                    "Created",
+                    "Experience",
                     "Actions",
                   ].map((head) => (
                     <th
@@ -374,21 +412,32 @@ export default function DoctorsPage() {
                   filteredDoctors.map((doctor, index) => (
                     <tr
                       key={doctor.id}
-                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/30 dark:hover:bg-slate-800/70 transition-all duration-200"
+                      className="border-b @@@border-slate-50 dark:border-slate-800@@@ hover:bg-blue-50/30 dark:hover:bg-slate-800/70 transition-all duration-200"
                     >
-                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 text-xs font-mono">
+                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 dark:text-slate-400 text-xs font-mono">
                         {index + 1}
                       </td>
 
-                      <td className="px-4 py-3 font-semibold text-slate-800 dark:text-white">
-                        Dr. {doctorName(doctor)}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <DoctorAvatar doctor={doctor} />
+
+                          <div>
+                            <p className="font-semibold @@@text-slate-800 dark:text-white@@@">
+                              Dr. {doctorName(doctor) || "—"}
+                            </p>
+                            <p className="text-[11px] text-slate-400">
+                              {doctor.qualification || "No qualification yet"}
+                            </p>
+                          </div>
+                        </div>
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
                         {doctor.email || "—"}
                       </td>
 
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
                         {doctor.phone || "—"}
                       </td>
 
@@ -398,9 +447,9 @@ export default function DoctorsPage() {
                         </span>
                       </td>
 
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs">
-                        {doctor.createdAt
-                          ? new Date(doctor.createdAt).toLocaleDateString()
+                      <td className="px-4 py-3 @@@text-slate-600 dark:text-slate-300@@@">
+                        {doctor.experienceYears
+                          ? `${doctor.experienceYears} years`
                           : "—"}
                       </td>
 
@@ -408,21 +457,21 @@ export default function DoctorsPage() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openView(doctor)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-950/40 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-blue-100 dark:hover:bg-blue-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-blue-600 dark:hover:text-blue-300 cursor-pointer"
                           >
                             <Eye size={15} />
                           </button>
 
                           <button
                             onClick={() => openEdit(doctor)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-950/40 text-slate-600 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-300 cursor-pointer"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-green-100 dark:hover:bg-green-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-green-600 dark:hover:text-green-300 cursor-pointer"
                           >
                             <Edit2 size={15} />
                           </button>
 
                           <button
                             onClick={() => openDelete(doctor)}
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-950/40 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-300 cursor-pointer"
+                            className="p-2 rounded-lg @@@bg-slate-100 dark:bg-slate-800@@@ hover:bg-red-100 dark:hover:bg-red-950/40 @@@text-slate-600 dark:text-slate-300@@@ hover:text-red-600 dark:hover:text-red-300 cursor-pointer"
                           >
                             <Trash2 size={15} />
                           </button>
@@ -436,7 +485,7 @@ export default function DoctorsPage() {
           </div>
 
           {!loading && filteredDoctors.length > 0 && (
-            <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400 dark:text-slate-400 flex justify-between">
+            <div className="px-4 py-3 border-t @@@border-slate-100 dark:border-slate-700@@@ text-xs text-slate-400 dark:text-slate-400 flex justify-between">
               <span>
                 Showing {filteredDoctors.length} of {doctors.length} doctors
               </span>
@@ -450,7 +499,7 @@ export default function DoctorsPage() {
         open={addOpen}
         onClose={() => setAddOpen(false)}
         title="Add Doctor"
-        subtitle="Create a new doctor profile"
+        subtitle="Create a professional doctor profile"
       >
         <DoctorForm
           form={form}
@@ -465,7 +514,7 @@ export default function DoctorsPage() {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         title="Edit Doctor"
-        subtitle="Update doctor profile"
+        subtitle="Update doctor professional profile"
       >
         <DoctorForm
           form={form}
@@ -479,23 +528,50 @@ export default function DoctorsPage() {
       <Drawer
         open={viewOpen}
         onClose={() => setViewOpen(false)}
-        title="Doctor Details"
-        subtitle="View doctor profile"
+        title="Doctor Profile"
+        subtitle="View doctor qualifications and professional details"
       >
         {selected && (
-          <div className="space-y-3 text-sm">
-            <Detail label="Name" value={`Dr. ${doctorName(selected)}`} />
-            <Detail label="Email" value={selected.email} />
-            <Detail label="Phone" value={selected.phone} />
-            <Detail label="Specialization" value={selected.specialization} />
-            <Detail
-              label="Created"
-              value={
-                selected.createdAt
-                  ? new Date(selected.createdAt).toLocaleString()
-                  : "—"
-              }
-            />
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 pb-4 border-b @@@border-slate-100 dark:border-slate-700@@@">
+              <DoctorAvatar doctor={selected} large />
+
+              <div>
+                <p className="text-lg font-extrabold @@@text-slate-800 dark:text-white@@@">
+                  Dr. {doctorName(selected)}
+                </p>
+                <p className="text-sm text-blue-600 dark:text-blue-300 font-semibold">
+                  {selected.specialization || "Specialization not set"}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {selected.qualification || "Qualification not added"}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <Detail label="Email" value={selected.email} />
+              <Detail label="Phone" value={selected.phone} />
+              <Detail label="Gender" value={selected.gender} />
+              <Detail
+                label="Experience"
+                value={
+                  selected.experienceYears
+                    ? `${selected.experienceYears} years`
+                    : "—"
+                }
+              />
+              <Detail label="License Number" value={selected.licenseNumber} />
+              <Detail label="Office Location" value={selected.officeLocation} />
+              <Detail label="Availability" value={selected.availability} full />
+              <Detail label="Biography" value={selected.bio} full />
+              <Detail label="Achievements" value={selected.achievements} full />
+              <Detail
+                label="Certifications"
+                value={selected.certifications}
+                full
+              />
+            </div>
           </div>
         )}
       </Drawer>
@@ -512,22 +588,11 @@ export default function DoctorsPage() {
   );
 }
 
-function Toast({ type, message }) {
-  const styles =
-    type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white";
-
-  return (
-    <div
-      className={`fixed top-6 right-6 z-[9999] px-5 py-3 rounded-xl shadow-lg text-sm font-semibold ${styles}`}
-    >
-      {message}
-    </div>
-  );
-}
-
 function DoctorForm({ form, onChange, onSubmit, saving, submitLabel }) {
   return (
     <div className="space-y-4">
+      <SectionTitle title="Basic Information" />
+
       <FormInput
         label="First Name"
         name="firstName"
@@ -543,6 +608,17 @@ function DoctorForm({ form, onChange, onSubmit, saving, submitLabel }) {
         onChange={onChange}
         placeholder="Last name"
       />
+
+      <FormSelect
+        label="Gender"
+        name="gender"
+        value={form.gender}
+        onChange={onChange}
+      >
+        <option value="">Select gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </FormSelect>
 
       <FormInput
         label="Email"
@@ -576,6 +652,83 @@ function DoctorForm({ form, onChange, onSubmit, saving, submitLabel }) {
         ))}
       </FormSelect>
 
+      <SectionTitle title="Professional Information" />
+
+      <FormInput
+        label="Qualification"
+        name="qualification"
+        value={form.qualification}
+        onChange={onChange}
+        placeholder="MBBS, MSc Cardiology"
+      />
+
+      <FormInput
+        label="Experience Years"
+        name="experienceYears"
+        type="number"
+        value={form.experienceYears}
+        onChange={onChange}
+        placeholder="10"
+      />
+
+      <FormInput
+        label="License Number"
+        name="licenseNumber"
+        value={form.licenseNumber}
+        onChange={onChange}
+        placeholder="MDCN-12345"
+      />
+
+      <FormInput
+        label="Office Location"
+        name="officeLocation"
+        value={form.officeLocation}
+        onChange={onChange}
+        placeholder="Block A - Room 12"
+      />
+
+      <FormInput
+        label="Availability"
+        name="availability"
+        value={form.availability}
+        onChange={onChange}
+        placeholder="Mon - Fri, 9AM - 4PM"
+      />
+
+      <FormInput
+        label="Profile Image URL"
+        name="profileImageUrl"
+        value={form.profileImageUrl}
+        onChange={onChange}
+        placeholder="https://..."
+      />
+
+      <SectionTitle title="Profile Details" />
+
+      <FormTextarea
+        label="Biography"
+        name="bio"
+        value={form.bio}
+        onChange={onChange}
+        placeholder="Write short professional biography..."
+      />
+
+      <FormTextarea
+        label="Achievements"
+        name="achievements"
+        value={form.achievements}
+        onChange={onChange}
+        placeholder="Awards, recognitions, research..."
+      />
+
+      <FormTextarea
+        label="Certifications"
+        name="certifications"
+        value={form.certifications}
+        onChange={onChange}
+        placeholder="Medical certifications and professional memberships..."
+      />
+
       <button
         type="button"
         onClick={onSubmit}
@@ -584,6 +737,53 @@ function DoctorForm({ form, onChange, onSubmit, saving, submitLabel }) {
       >
         {saving ? "Saving..." : submitLabel}
       </button>
+    </div>
+  );
+}
+
+function SectionTitle({ title }) {
+  return (
+    <div className="pt-2 border-t @@@border-slate-100 dark:border-slate-700@@@">
+      <p className="text-xs font-extrabold text-blue-600 dark:text-blue-300 uppercase tracking-widest">
+        {title}
+      </p>
+    </div>
+  );
+}
+
+function DoctorAvatar({ doctor, large = false }) {
+  const size = large
+    ? "w-16 h-16 text-2xl rounded-2xl"
+    : "w-10 h-10 text-sm rounded-full";
+
+  if (doctor?.profileImageUrl) {
+    return (
+      <img
+        src={doctor.profileImageUrl}
+        alt="Doctor"
+        className={`${size} object-cover border @@@border-slate-200 dark:border-slate-700@@@`}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`${size} bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold shrink-0`}
+    >
+      {(doctor?.firstName || "?").charAt(0)}
+    </div>
+  );
+}
+
+function Toast({ type, message }) {
+  const styles =
+    type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white";
+
+  return (
+    <div
+      className={`fixed top-6 right-6 z-[9999] px-5 py-3 rounded-xl shadow-lg text-sm font-semibold ${styles}`}
+    >
+      {message}
     </div>
   );
 }
@@ -602,7 +802,7 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
         colors[color] || colors.blue
       } rounded-2xl p-5 text-white shadow-sm hover:shadow-lg transition`}
     >
-      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/20 flex items-center justify-center mb-4">
         <Icon size={20} />
       </div>
 
@@ -617,13 +817,13 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center text-center">
       <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 flex items-center justify-center mb-3">
-        <Stethoscope size={22} />
+        <BriefcaseMedical size={22} />
       </div>
       <h3 className="text-sm font-bold text-slate-700 dark:text-white">
         No doctors found
       </h3>
       <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
-        Add a doctor profile to begin shift scheduling.
+        Add a doctor profile to begin professional scheduling.
       </p>
     </div>
   );
@@ -649,7 +849,26 @@ function FormInput({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 placeholder:text-slate-400"
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+      />
+    </div>
+  );
+}
+
+function FormTextarea({ label, name, value, onChange, placeholder }) {
+  return (
+    <div>
+      <label className="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide">
+        {label}
+      </label>
+
+      <textarea
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        rows={4}
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
       />
     </div>
   );
@@ -666,7 +885,7 @@ function FormSelect({ label, name, value, onChange, children }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+        className="w-full mt-1 px-4 py-3 rounded-xl border @@@border-slate-200 dark:border-slate-700@@@ bg-white dark:bg-slate-950 @@@text-slate-800 dark:text-white@@@ text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
       >
         {children}
       </select>
@@ -674,13 +893,17 @@ function FormSelect({ label, name, value, onChange, children }) {
   );
 }
 
-function Detail({ label, value }) {
+function Detail({ label, value, full = false }) {
   return (
-    <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-3">
+    <div
+      className={`@@@bg-slate-50 dark:bg-slate-800@@@ rounded-xl px-3 py-3 ${
+        full ? "sm:col-span-2" : ""
+      }`}
+    >
       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wide">
         {label}
       </p>
-      <p className="text-slate-700 dark:text-white font-medium mt-1">
+      <p className="text-slate-700 dark:text-white font-medium mt-1 whitespace-pre-wrap">
         {value || "—"}
       </p>
     </div>
@@ -692,10 +915,10 @@ function Drawer({ open, onClose, title, subtitle, children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm">
-      <div className="h-full w-full max-w-xl bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-2xl overflow-y-auto animate-slideIn">
-        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+      <div className="h-full w-full max-w-xl @@@bg-white dark:bg-slate-900@@@ border-l @@@border-slate-200 dark:border-slate-700@@@ shadow-2xl overflow-y-auto animate-slideIn">
+        <div className="sticky top-0 @@@bg-white dark:bg-slate-900@@@ border-b @@@border-slate-100 dark:border-slate-700@@@ px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-800 dark:text-white">
+            <h2 className="text-xl font-extrabold @@@text-slate-800 dark:text-white@@@">
               {title}
             </h2>
             <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
@@ -722,12 +945,12 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border border-slate-100 dark:border-slate-700">
+      <div className="@@@bg-white dark:bg-slate-900@@@ rounded-2xl shadow-xl w-full max-w-[420px] p-6 text-center border @@@border-slate-100 dark:border-slate-700@@@">
         <h2 className="text-xl font-extrabold text-red-600 dark:text-red-400 mb-3">
           {title}
         </h2>
 
-        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+        <p className="text-sm @@@text-slate-600 dark:text-slate-300@@@ mb-6">
           {message}
         </p>
 
@@ -735,7 +958,7 @@ function ConfirmModal({ open, onClose, onConfirm, title, message, loading }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+            className="px-5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 @@@text-slate-700 dark:text-slate-200@@@"
           >
             Cancel
           </button>

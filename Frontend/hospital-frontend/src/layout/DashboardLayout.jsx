@@ -20,6 +20,7 @@ import {
   Sun,
   Moon,
   Settings,
+  FlaskConical,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -41,7 +42,6 @@ const NAV_ITEMS = [
     icon: LayoutDashboard,
     roles: ["doctor"],
   },
-
   {
     label: "Patients",
     path: "/patients",
@@ -60,7 +60,6 @@ const NAV_ITEMS = [
     icon: CalendarDays,
     roles: ["admin", "receptionist"],
   },
-
   {
     label: "My Appointments",
     path: "/patient/appointments",
@@ -73,12 +72,23 @@ const NAV_ITEMS = [
     icon: ClipboardPlus,
     roles: ["patient"],
   },
-
   {
     label: "Medical Records",
     path: "/medical-records",
     icon: FileText,
     roles: ["admin", "doctor", "patient"],
+  },
+  {
+    label: "Test Results",
+    path: "/patient/test-results",
+    icon: FlaskConical,
+    roles: ["patient"],
+  },
+  {
+    label: "Test Results",
+    path: "/doctor/test-results",
+    icon: FlaskConical,
+    roles: ["doctor"],
   },
   {
     label: "Chat",
@@ -104,8 +114,12 @@ const NAV_ITEMS = [
     icon: Activity,
     roles: ["admin"],
   },
-
-  { label: "Profile", path: "/patient", icon: UserRound, roles: ["patient"] },
+  {
+    label: "Profile",
+    path: "/patient",
+    icon: UserRound,
+    roles: ["patient"],
+  },
 ];
 
 const PAGE_TITLES = {
@@ -116,6 +130,8 @@ const PAGE_TITLES = {
   "/appointments": ["Dashboard", "Appointments"],
   "/patient/appointments": ["Dashboard", "My Appointments"],
   "/patient/book-appointment": ["Dashboard", "Book Appointment"],
+  "/patient/test-results": ["Dashboard", "My Test Results"],
+  "/doctor/test-results": ["Dashboard", "Test Results"],
   "/billing": ["Dashboard", "Billing"],
   "/medical-records": ["Dashboard", "Medical Records"],
   "/doctors": ["Dashboard", "Doctors"],
@@ -151,6 +167,7 @@ export default function DashboardLayout({ children }) {
 
   const displayName =
     `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+    user?.fullName ||
     user?.name ||
     user?.userName ||
     role.toUpperCase();
