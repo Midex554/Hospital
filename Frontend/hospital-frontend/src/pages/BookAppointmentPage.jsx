@@ -39,7 +39,7 @@ export default function BookAppointmentPage() {
         },
       };
 
-      const res = await api.post("/appointments", payload);
+      const res = await api.post("/appointmentslo", payload);
 
       setMessage(
         `Appointment booked successfully with Dr. ${res.data.doctor.firstName} ${res.data.doctor.lastName}`,

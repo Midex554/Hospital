@@ -25,15 +25,15 @@ import loginBg from "../assets/videos/286443_medium.mp4";
 
 function FeatureCard({ icon: Icon, title, text }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white dark:bg-slate-900/[0.06] p-5 backdrop-blur-xl hover:bg-white dark:bg-slate-900/[0.09] transition-all duration-200">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md hover:bg-white/10 transition">
       <div className="flex gap-4 items-start">
-        <div className="w-11 h-11 rounded-xl bg-blue-600/30 text-cyan-300 flex items-center justify-center shrink-0">
+        <div className="w-11 h-11 rounded-xl bg-blue-600/25 text-cyan-300 flex items-center justify-center shrink-0">
           <Icon size={20} />
         </div>
 
         <div>
           <h3 className="text-white font-bold text-sm">{title}</h3>
-          <p className="text-white/50 text-xs mt-1 leading-relaxed">{text}</p>
+          <p className="text-white/55 text-xs mt-1 leading-relaxed">{text}</p>
         </div>
       </div>
     </div>
@@ -42,14 +42,14 @@ function FeatureCard({ icon: Icon, title, text }) {
 
 function TrustBadge({ icon: Icon, title, text }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-slate-950/60 border border-white/10 px-5 py-3 backdrop-blur-xl">
-      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/10 text-cyan-300 flex items-center justify-center shrink-0">
+    <div className="flex items-center gap-3 rounded-2xl bg-black/25 border border-white/10 px-5 py-3 backdrop-blur-xl">
+      <div className="w-10 h-10 rounded-xl bg-white/10 text-cyan-300 flex items-center justify-center shrink-0">
         <Icon size={19} />
       </div>
 
       <div>
         <p className="text-white font-bold text-sm leading-tight">{title}</p>
-        <p className="text-white/45 text-xs">{text}</p>
+        <p className="text-white/55 text-xs">{text}</p>
       </div>
     </div>
   );
@@ -58,14 +58,14 @@ function TrustBadge({ icon: Icon, title, text }) {
 function Input({ icon: Icon, label, name, value, onChange, type = "text" }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-white/80 mb-1.5">
+      <label className="block text-sm font-semibold text-white/90 mb-1.5">
         {label}
       </label>
 
       <div className="relative">
         <Icon
           size={16}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50"
         />
 
         <input
@@ -74,7 +74,7 @@ function Input({ icon: Icon, label, name, value, onChange, type = "text" }) {
           value={value}
           onChange={onChange}
           placeholder={`Enter ${label.toLowerCase()}`}
-          className="w-full h-[50px] rounded-xl border border-white/15 bg-white dark:bg-slate-900/[0.08] pl-11 pr-4 text-sm text-white placeholder-white/35 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
+          className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/10 pl-11 pr-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
         />
       </div>
     </div>
@@ -294,7 +294,7 @@ export default function PatientRegister() {
               />
             </div>
 
-            <div className="mt-8 rounded-2xl border border-white/10 bg-white dark:bg-slate-900/[0.05] backdrop-blur-xl p-4 flex items-center justify-between">
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 dark:bg-slate-900/[0.05] backdrop-blur-xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-xl bg-blue-600/25 flex items-center justify-center text-cyan-300 shrink-0">
                   <ShieldCheck size={20} />
@@ -326,7 +326,7 @@ export default function PatientRegister() {
 
         <section className="min-h-screen flex flex-col items-center justify-center px-5 py-10">
           <div className="w-full max-w-[560px] rounded-[30px] border border-white/15 bg-[#0d1f3c]/60 backdrop-blur-2xl shadow-[0_30px_100px_rgba(0,0,0,0.6)] px-6 sm:px-8 py-8">
-            <div className="mx-auto w-18 h-18 rounded-full bg-white dark:bg-slate-900/90 flex items-center justify-center mb-5 shadow-[0_0_50px_rgba(34,211,238,0.35)]">
+            <div className="mx-auto w-18 h-18 rounded-full bg-white dark:bg-slate-900/90 flex items-center justify-center mb-5 shadow-[0_0_18px_rgba(34,211,238,0.75)]">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
                 <UserPlus size={23} className="text-white" />
               </div>
@@ -342,7 +342,7 @@ export default function PatientRegister() {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="grid grid-cols-3 gap-3 mt-5">
               <MiniFeature icon={ShieldCheck} text="Secure" />
               <MiniFeature icon={HeartPulse} text="Healthcare" />
               <MiniFeature icon={UserPlus} text="Portal" />
@@ -394,7 +394,7 @@ export default function PatientRegister() {
                     name="gender"
                     value={form.gender}
                     onChange={handleChange}
-                    className="w-full h-[50px] rounded-xl border border-white/15 bg-white dark:bg-slate-900/[0.08] px-4 text-sm text-white outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
+                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/10 pl-11 pr-11 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
                   >
                     <option value="" className="text-black">
                       Select gender
@@ -426,7 +426,7 @@ export default function PatientRegister() {
                     value={form.password}
                     onChange={handleChange}
                     placeholder="Enter password"
-                    className="w-full h-[50px] rounded-xl border border-white/15 bg-white dark:bg-slate-900/[0.08] pl-11 pr-11 text-sm text-white placeholder-white/35 outline-none focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/15 transition"
+                    className="w-full h-[48px] sm:h-[52px] rounded-xl border border-white/15 bg-white/10 pl-11 pr-11 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/15 transition"
                   />
 
                   <button
@@ -462,7 +462,7 @@ export default function PatientRegister() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-[52px] rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600 text-white font-bold text-sm shadow-[0_12px_35px_rgba(37,99,235,0.4)] hover:scale-[1.015] active:scale-[0.985] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full h-[52px] rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600 text-black font-bold text-sm shadow-[0_12px_35px_rgba(37,99,235,0.4)] hover:scale-[1.015] active:scale-[0.985] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   "Creating Account..."
